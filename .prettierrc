@@ -1,0 +1,8 @@
+{
+    "printWidth": 1200,
+    "tabWidth": 4,
+    "singleAttributePerLine": false,
+    "bracketSameLine": true,
+    "htmlWhitespaceSensitivity": "ignore",
+    "vueIndentScriptAndStyle": false
+}
