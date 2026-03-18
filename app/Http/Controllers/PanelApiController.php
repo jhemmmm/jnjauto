@@ -104,9 +104,14 @@ class PanelApiController extends Controller
             ]);
 
         // Time slots
+        $isSqlite = \DB::getDriverName() === 'sqlite';
+        $timeExpr = $isSqlite
+            ? "strftime('%H:%M', time) as slot_time"
+            : "TIME_FORMAT(time, '%H:%i') as slot_time";
+
         $slotCounts = Appointment::whereDate('date', $today)
             ->whereNotIn('status', ['cancelled'])
-            ->selectRaw("TIME_FORMAT(time, '%H:%i') as slot_time, COUNT(*) as count")
+            ->selectRaw("$timeExpr, COUNT(*) as count")
             ->groupBy('slot_time')
             ->pluck('count', 'slot_time');
 
@@ -173,7 +178,7 @@ class PanelApiController extends Controller
     {
         return InventoryItem::with('category')
             ->whereIn('status', ['low_stock', 'out_of_stock'])
-            ->orderByRaw("FIELD(status, 'out_of_stock', 'low_stock')")
+            ->orderByRaw("CASE status WHEN 'out_of_stock' THEN 0 WHEN 'low_stock' THEN 1 ELSE 2 END")
             ->limit(6)
             ->get()
             ->map(fn ($i) => [
