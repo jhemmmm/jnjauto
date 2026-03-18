@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -21,16 +21,20 @@ return new class extends Migration
 
         // Seed default business settings
         $defaults = [
-            ['key' => 'business_name',    'value' => 'JNJ Auto Car Wash'],
-            ['key' => 'business_email',   'value' => 'info@jnjauto.com'],
-            ['key' => 'business_phone',   'value' => '(555) 123-4567'],
-            ['key' => 'business_address', 'value' => '123 Main Street, Manila, Philippines'],
-            ['key' => 'opening_time',     'value' => '07:00'],
-            ['key' => 'closing_time',     'value' => '17:00'],
-            ['key' => 'slot_duration',    'value' => '30'],
-            ['key' => 'slot_capacity',    'value' => '2'],
-            ['key' => 'currency',         'value' => 'PHP'],
-            ['key' => 'timezone',         'value' => 'Asia/Manila'],
+            ['key' => 'business_name', 'value' => 'JNJ Auto Car Wash'],
+            ['key' => 'business_email', 'value' => 'info@jnjauto.com'],
+            ['key' => 'business_phone', 'value' => '(+63) 919-123-4567'],
+            ['key' => 'business_address', 'value' => '123 I Have, No Idea, Naga City, Philippines'],
+            ['key' => 'opening_time', 'value' => '07:00'],
+            ['key' => 'closing_time', 'value' => '17:00'],
+            ['key' => 'slot_duration', 'value' => '30'],
+            ['key' => 'slot_capacity', 'value' => '2'],
+            ['key' => 'currency', 'value' => 'PHP'],
+            ['key' => 'timezone', 'value' => 'Asia/Manila'],
+            ['key' => 'business_logo', 'value' => null],
+            ['key' => 'app_name_first', 'value' => 'Wash'],
+            ['key' => 'app_name_last', 'value' => 'Wise'],
+            ['key' => 'show_emergency_phone', 'value' => '1'],
         ];
 
         foreach ($defaults as $setting) {

@@ -4,6 +4,43 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon $date
+ * @property string $time
+ * @property int $service_id
+ * @property int $size_id
+ * @property string $customer_name
+ * @property string|null $customer_email
+ * @property string|null $customer_phone
+ * @property string|null $notes
+ * @property string $status
+ * @property numeric|null $amount
+ * @property \Illuminate\Support\Carbon|null $completed_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Service|null $service
+ * @property-read \App\Models\Size|null $size
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment completed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereCompletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereCustomerEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereCustomerName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereCustomerPhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereServiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereSizeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Appointment whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Appointment extends Model
 {
     //

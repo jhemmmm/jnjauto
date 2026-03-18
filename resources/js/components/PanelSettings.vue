@@ -123,6 +123,77 @@
                             <p class="text-secondary small mb-4">Your car wash business details shown to customers.</p>
 
                             <form @submit.prevent="saveBusinessSettings">
+                                <!-- Application Branding -->
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fa-solid fa-palette me-2 text-info"></i>
+                                    Application Branding
+                                </h6>
+
+                                <!-- Logo Upload -->
+                                <div class="d-flex align-items-center gap-4 mb-4">
+                                    <div class="position-relative">
+                                        <div v-if="logoPreview || business.business_logo_url" class="rounded-4 overflow-hidden border" style="width: 80px; height: 80px">
+                                            <img :src="logoPreview || business.business_logo_url" alt="Logo" class="w-100 h-100" style="object-fit: cover" />
+                                        </div>
+                                        <div v-else class="rounded-4 border d-flex align-items-center justify-content-center bg-light" style="width: 80px; height: 80px">
+                                            <i class="fa-solid fa-droplet fa-2x text-info"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="btn btn-light border rounded-4 px-3 py-2 fw-semibold me-2" style="cursor: pointer">
+                                            <i class="fa-solid fa-upload me-2"></i>
+                                            Upload Logo
+                                            <input type="file" class="d-none" accept="image/jpeg,image/png,image/webp,image/svg+xml" @change="onLogoSelected" ref="logoInput" />
+                                        </label>
+                                        <button v-if="logoPreview || business.business_logo_url" type="button" class="btn btn-outline-danger rounded-4 px-3 py-2 fw-semibold" @click="removeLogo">
+                                            <i class="fa-solid fa-trash me-2"></i>
+                                            Remove
+                                        </button>
+                                        <div class="form-text small mt-1">JPG, PNG, WebP, or SVG. Max 2MB.</div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Application Name (First Part)</label>
+                                        <input type="text" class="form-control rounded-4" v-model="business.app_name_first" placeholder="Wash" />
+                                        <div class="form-text small">
+                                            Displayed in
+                                            <span class="text-primary fw-bold">blue</span>
+                                            .
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Application Name (Second Part)</label>
+                                        <input type="text" class="form-control rounded-4" v-model="business.app_name_last" placeholder="Wise" />
+                                        <div class="form-text small">
+                                            Displayed in
+                                            <span class="text-dark fw-bold">black</span>
+                                            .
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-center gap-2 p-3 rounded-4 bg-light border">
+                                            <span class="small text-secondary me-2">Preview:</span>
+                                            <div v-if="logoPreview || business.business_logo_url" class="rounded-3 overflow-hidden border" style="width: 32px; height: 32px">
+                                                <img :src="logoPreview || business.business_logo_url" alt="Logo" class="w-100 h-100" style="object-fit: cover" />
+                                            </div>
+                                            <div v-else class="brand-icon-box bg-primary text-white d-inline-flex align-items-center justify-content-center rounded-3" style="width: 32px; height: 32px; font-size: 14px">
+                                                <i class="fa-solid fa-droplet"></i>
+                                            </div>
+                                            <span class="fw-bold fs-5">
+                                                <span class="text-primary">{{ business.app_name_first || "JNJ" }}</span>
+                                                <span class="text-dark">{{ business.app_name_last || "Auto" }}</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Business Details -->
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fa-solid fa-building me-2 text-info"></i>
+                                    Business Details
+                                </h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Business Name</label>
@@ -321,6 +392,8 @@ export default {
             showPasswords: { current: false, new: false, confirm: false },
             business: {
                 business_name: "",
+                app_name_first: "JNJ",
+                app_name_last: "Auto",
                 business_email: "",
                 business_phone: "",
                 business_address: "",
@@ -331,7 +404,10 @@ export default {
                 currency: "PHP",
                 timezone: "Asia/Manila",
                 show_emergency_phone: "1",
+                business_logo_url: null,
             },
+            logoFile: null,
+            logoPreview: null,
             saving: {
                 profile: false,
                 password: false,
@@ -428,12 +504,58 @@ export default {
         async saveBusinessSettings() {
             this.saving.business = true;
             try {
-                const { data } = await axios.put("/panel/api/settings/business", this.business);
+                const formData = new FormData();
+                formData.append("_method", "PUT");
+
+                const keys = ["business_name", "app_name_first", "app_name_last", "business_email", "business_phone", "business_address", "opening_time", "closing_time", "slot_duration", "slot_capacity", "currency", "timezone", "show_emergency_phone"];
+                keys.forEach((key) => {
+                    if (this.business[key] !== undefined && this.business[key] !== null) {
+                        formData.append(key, this.business[key]);
+                    }
+                });
+
+                if (this.logoFile) {
+                    formData.append("business_logo", this.logoFile);
+                }
+
+                const { data } = await axios.post("/panel/api/settings/business", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+                this.logoFile = null;
+                this.logoPreview = null;
                 this.showToast(data.message, "success");
+                // Refresh to get the updated logo URL
+                await this.fetchSettings();
             } catch (e) {
                 this.showToast(e.response?.data?.message || "Failed to update settings.", "danger");
             } finally {
                 this.saving.business = false;
+            }
+        },
+
+        onLogoSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                this.showToast("Logo file must be under 2MB.", "danger");
+                return;
+            }
+            this.logoFile = file;
+            this.logoPreview = URL.createObjectURL(file);
+        },
+
+        async removeLogo() {
+            try {
+                if (this.business.business_logo_url) {
+                    await axios.delete("/panel/api/settings/business/logo");
+                }
+                this.logoFile = null;
+                this.logoPreview = null;
+                this.business.business_logo_url = null;
+                if (this.$refs.logoInput) this.$refs.logoInput.value = "";
+                this.showToast("Logo removed.", "success");
+            } catch (e) {
+                this.showToast("Failed to remove logo.", "danger");
             }
         },
 
@@ -464,8 +586,14 @@ export default {
                 callback: async () => {
                     this.saving.resetBusiness = true;
                     try {
+                        // Remove logo first
+                        if (this.business.business_logo_url) {
+                            await axios.delete("/panel/api/settings/business/logo");
+                        }
                         const defaults = {
                             business_name: "JNJ Auto Car Wash",
+                            app_name_first: "JNJ",
+                            app_name_last: "Auto",
                             business_email: "info@jnjauto.com",
                             business_phone: "(555) 123-4567",
                             business_address: "123 Main Street, Manila, Philippines",
@@ -479,6 +607,9 @@ export default {
                         };
                         const { data } = await axios.put("/panel/api/settings/business", defaults);
                         Object.assign(this.business, defaults);
+                        this.business.business_logo_url = null;
+                        this.logoFile = null;
+                        this.logoPreview = null;
                         this.showToast("Business settings reset to defaults.", "success");
                     } catch (e) {
                         this.showToast("Failed to reset settings.", "danger");

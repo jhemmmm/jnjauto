@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ $settings['business_name'] ?? config('app.name', 'Laravel') }}</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,12 +25,16 @@
                 <div class="p-3 p-xl-4 h-100 d-flex flex-column">
 
                     <div class="d-flex align-items-center gap-3 px-2 mb-4">
-                        <div class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4">
-                            <i class="fa-solid fa-droplet"></i>
+                        <div class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                            @if(!empty($settings['business_logo_url']))
+                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                            @else
+                                <i class="fa-solid fa-droplet"></i>
+                            @endif
                         </div>
                         <div>
-                            <h1 class="h4 fw-bold mb-0"><span class="text-info-emphasis">JNJ</span>Auto</h1>
-                            <div class="small text-secondary">Car Wash Admin Panel</div>
+                            <h1 class="h4 fw-bold mb-0"><span class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}</h1>
+                            <div class="small text-secondary">Admin Panel</div>
                         </div>
                     </div>
 
@@ -55,12 +59,16 @@
             <div class="offcanvas offcanvas-start admin-offcanvas border-0" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
                 <div class="offcanvas-header px-3 pt-3 pb-2">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4">
-                            <i class="fa-solid fa-droplet"></i>
+                        <div class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                            @if(!empty($settings['business_logo_url']))
+                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                            @else
+                                <i class="fa-solid fa-droplet"></i>
+                            @endif
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-0" id="mobileSidebarLabel"><span class="text-info-emphasis">JNJ</span>Auto</h5>
-                            <div class="small text-secondary">Car Wash Admin Panel</div>
+                            <h5 class="fw-bold mb-0" id="mobileSidebarLabel"><span class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}</h5>
+                            <div class="small text-secondary">Admin Panel</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -93,10 +101,14 @@
                         </button>
 
                         <div class="d-flex align-items-center gap-2">
-                            <div class="brand-icon brand-icon-sm d-inline-flex align-items-center justify-content-center rounded-4">
-                                <i class="fa-solid fa-droplet"></i>
+                            <div class="brand-icon brand-icon-sm d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                                @if(!empty($settings['business_logo_url']))
+                                    <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                                @else
+                                    <i class="fa-solid fa-droplet"></i>
+                                @endif
                             </div>
-                            <div class="fw-bold"><span class="text-info-emphasis">JNJ</span>Auto</div>
+                            <div class="fw-bold"><span class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}</div>
                         </div>
 
                         <notification-bell></notification-bell>

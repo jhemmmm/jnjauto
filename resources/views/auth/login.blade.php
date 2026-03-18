@@ -9,13 +9,19 @@
                         <div class="card-body p-4 p-md-5">
                             <div class="text-center mb-4">
                                 <div class="d-flex justify-content-center mb-2">
-                                    <div class="brand-icon-box bg-primary text-white auth-logo">
-                                        <i class="fa-solid fa-droplet"></i>
+                                    <div class="brand-icon-box bg-primary text-white auth-logo overflow-hidden">
+                                        @if (!empty($settings['business_logo_url']))
+                                            <img src="{{ $settings['business_logo_url'] }}" alt="Logo"
+                                                class="w-100 h-100" style="object-fit: cover;" />
+                                        @else
+                                            <i class="fa-solid fa-droplet"></i>
+                                        @endif
                                     </div>
                                 </div>
 
                                 <div class="fw-bold fs-3">
-                                    <span class="text-primary">JNJ</span><span class="text-dark">Auto</span>
+                                    <span class="text-primary">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span
+                                        class="text-dark">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
                                 </div>
 
                                 <div class="text-secondary small">
@@ -38,7 +44,10 @@
                                         <span class="input-group-text bg-light border-0">
                                             <i class="fa-solid fa-envelope text-secondary"></i>
                                         </span>
-                                        <input id="email" type="email" class="form-control border-0 bg-light @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="admin@jnjcarwash.com">
+                                        <input id="email" type="email"
+                                            class="form-control border-0 bg-light @error('email') is-invalid @enderror"
+                                            name="email" value="{{ old('email') }}" required autocomplete="email"
+                                            autofocus placeholder="admin@jnjcarwash.com">
                                     </div>
                                     @error('email')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -51,8 +60,12 @@
                                         <span class="input-group-text bg-light border-0">
                                             <i class="fa-solid fa-lock text-secondary"></i>
                                         </span>
-                                        <input id="password" type="password" class="form-control border-0 bg-light @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder="Enter your password">
-                                        <button class="btn bg-light border-0" type="button" id="togglePassword" aria-label="Show password">
+                                        <input id="password" type="password"
+                                            class="form-control border-0 bg-light @error('password') is-invalid @enderror"
+                                            name="password" required autocomplete="current-password"
+                                            placeholder="Enter your password">
+                                        <button class="btn bg-light border-0" type="button" id="togglePassword"
+                                            aria-label="Show password">
                                             <i class="fa-solid fa-eye text-secondary" id="toggleIcon"></i>
                                         </button>
                                     </div>
@@ -63,14 +76,16 @@
 
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" name="remember" id="remember"
+                                            {{ old('remember') ? 'checked' : '' }}>
                                         <label class="form-check-label text-secondary" for="remember">
                                             Remember me
                                         </label>
                                     </div>
 
                                     @if (Route::has('password.request'))
-                                        <a class="small text-decoration-none fw-semibold" href="{{ route('password.request') }}">
+                                        <a class="small text-decoration-none fw-semibold"
+                                            href="{{ route('password.request') }}">
                                             Forgot password?
                                         </a>
                                     @endif
@@ -81,7 +96,7 @@
                                 </button>
 
                                 <div class="text-center text-secondary small mt-3">
-                                    © {{ date('Y') }} JNJ CarWash
+                                    &copy; {{ date('Y') }} {{ $settings['business_name'] ?? 'JNJ CarWash' }}
                                 </div>
                             </form>
 

@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Appointment;
-use App\Models\Service;
-use App\Models\Size;
 use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
 use App\Models\InventoryLog;
 use App\Models\Notification;
-use App\Models\Setting;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\Service;
+use App\Models\Setting;
+use App\Models\Size;
+use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Http\Request;
 
 class PanelApiController extends Controller
 {
@@ -37,9 +37,9 @@ class PanelApiController extends Controller
 
         // Calculate total slots from settings
         $openHour = (int) substr($openingTime, 0, 2);
-        $openMin  = (int) substr($openingTime, 3, 2);
+        $openMin = (int) substr($openingTime, 3, 2);
         $closeHour = (int) substr($closingTime, 0, 2);
-        $closeMin  = (int) substr($closingTime, 3, 2);
+        $closeMin = (int) substr($closingTime, 3, 2);
         $totalMinutes = ($closeHour * 60 + $closeMin) - ($openHour * 60 + $openMin);
         $totalSlots = max(1, (int) floor($totalMinutes / $slotDuration));
 
@@ -80,7 +80,7 @@ class PanelApiController extends Controller
             ->with('service')
             ->orderByDesc('total_revenue')
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'name' => $item->service->name ?? 'Unknown',
                 'description' => $item->service->description ?? '',
                 'bookings' => $item->booking_count,
@@ -93,7 +93,7 @@ class PanelApiController extends Controller
             ->orderBy('time', 'desc')
             ->limit(8)
             ->get()
-            ->map(fn($a) => [
+            ->map(fn ($a) => [
                 'id' => $a->id,
                 'customer_name' => $a->customer_name,
                 'customer_phone' => $a->customer_phone,
@@ -157,11 +157,12 @@ class PanelApiController extends Controller
         foreach ($period as $date) {
             $key = $date->format('Y-m-d');
             $result[] = [
-                'day'   => $date->format('D'),
-                'date'  => $date->format('M d'),
+                'day' => $date->format('D'),
+                'date' => $date->format('M d'),
                 'total' => (float) ($dailyTotals[$key] ?? 0),
             ];
         }
+
         return $result;
     }
 
@@ -175,14 +176,14 @@ class PanelApiController extends Controller
             ->orderByRaw("FIELD(status, 'out_of_stock', 'low_stock')")
             ->limit(6)
             ->get()
-            ->map(fn($i) => [
-                'id'            => $i->id,
-                'name'          => $i->name,
-                'category'      => $i->category->name ?? '—',
-                'quantity'      => $i->quantity,
-                'unit'          => $i->unit,
+            ->map(fn ($i) => [
+                'id' => $i->id,
+                'name' => $i->name,
+                'category' => $i->category->name ?? '—',
+                'quantity' => $i->quantity,
+                'unit' => $i->unit,
                 'reorder_level' => $i->reorder_level,
-                'status'        => $i->status,
+                'status' => $i->status,
             ])
             ->toArray();
     }
@@ -252,7 +253,7 @@ class PanelApiController extends Controller
         $closingTime = Setting::get('closing_time', '17:00');
 
         if ($request->time < $openingTime || $request->time >= $closingTime) {
-            return response()->json(['message' => 'Selected time is outside operating hours (' . $openingTime . ' – ' . $closingTime . ').'], 422);
+            return response()->json(['message' => 'Selected time is outside operating hours ('.$openingTime.' – '.$closingTime.').'], 422);
         }
 
         // Validate slot capacity
@@ -283,7 +284,7 @@ class PanelApiController extends Controller
         Notification::notifyAdmins(
             'appointment_created',
             'New Appointment Booked',
-            $appointment->customer_name . ' booked a ' . ($appointment->service->name ?? 'service') . ' for ' . \Carbon\Carbon::parse($appointment->date)->format('M d, Y') . ' at ' . \Carbon\Carbon::parse($appointment->time)->format('g:i A') . '.',
+            $appointment->customer_name.' booked a '.($appointment->service->name ?? 'service').' for '.Carbon::parse($appointment->date)->format('M d, Y').' at '.Carbon::parse($appointment->time)->format('g:i A').'.',
             'fa-solid fa-calendar-plus',
             'primary',
             '/panel/appointments',
@@ -314,7 +315,7 @@ class PanelApiController extends Controller
         $closingTime = Setting::get('closing_time', '17:00');
 
         if ($request->time < $openingTime || $request->time >= $closingTime) {
-            return response()->json(['message' => 'Selected time is outside operating hours (' . $openingTime . ' – ' . $closingTime . ').'], 422);
+            return response()->json(['message' => 'Selected time is outside operating hours ('.$openingTime.' – '.$closingTime.').'], 422);
         }
 
         // Validate slot capacity (exclude this appointment from the count)
@@ -357,7 +358,7 @@ class PanelApiController extends Controller
         $data = ['status' => $request->status];
 
         if ($request->status === 'completed' && $appointment->status !== 'completed') {
-            $basePrice  = $appointment->service?->price ?? 0;
+            $basePrice = $appointment->service?->price ?? 0;
             $multiplier = $appointment->size?->multiplier ?? 1;
             $data['amount'] = round($basePrice * $multiplier, 2);
             $data['completed_at'] = now();
@@ -381,9 +382,9 @@ class PanelApiController extends Controller
         $label = $statusLabels[$request->status] ?? ['Status Updated', 'fa-solid fa-circle-info', 'secondary'];
 
         Notification::notifyAdmins(
-            'appointment_' . $request->status,
+            'appointment_'.$request->status,
             $label[0],
-            $appointment->customer_name . '\'s appointment has been marked as ' . str_replace('_', ' ', $request->status) . '.',
+            $appointment->customer_name.'\'s appointment has been marked as '.str_replace('_', ' ', $request->status).'.',
             $label[1],
             $label[2],
             '/panel/appointments',
@@ -399,6 +400,7 @@ class PanelApiController extends Controller
     public function destroyAppointment(Appointment $appointment)
     {
         $appointment->delete();
+
         return response()->json(['message' => 'Appointment deleted successfully.']);
     }
 
@@ -425,6 +427,7 @@ class PanelApiController extends Controller
         ]);
 
         $service = Service::create($request->only('name', 'description', 'price'));
+
         return response()->json(['message' => 'Service created successfully.', 'service' => $service]);
     }
 
@@ -440,6 +443,7 @@ class PanelApiController extends Controller
         ]);
 
         $service->update($request->only('name', 'description', 'price'));
+
         return response()->json(['message' => 'Service updated successfully.', 'service' => $service]);
     }
 
@@ -457,6 +461,7 @@ class PanelApiController extends Controller
         }
 
         $service->delete();
+
         return response()->json(['message' => 'Service deleted successfully.']);
     }
 
@@ -472,6 +477,7 @@ class PanelApiController extends Controller
         ]);
 
         $size = Size::create($request->only('name', 'description', 'multiplier'));
+
         return response()->json(['message' => 'Size created successfully.', 'size' => $size]);
     }
 
@@ -487,6 +493,7 @@ class PanelApiController extends Controller
         ]);
 
         $size->update($request->only('name', 'description', 'multiplier'));
+
         return response()->json(['message' => 'Size updated successfully.', 'size' => $size]);
     }
 
@@ -504,6 +511,7 @@ class PanelApiController extends Controller
         }
 
         $size->delete();
+
         return response()->json(['message' => 'Size deleted successfully.']);
     }
 
@@ -573,7 +581,7 @@ class PanelApiController extends Controller
             ->with('service')
             ->orderByDesc('total_revenue')
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'service_name' => $item->service->name ?? 'Unknown',
                 'total_revenue' => (float) $item->total_revenue,
                 'total_count' => (int) $item->total_count,
@@ -657,8 +665,8 @@ class PanelApiController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -667,16 +675,16 @@ class PanelApiController extends Controller
         $categories = InventoryCategory::withCount('items')->orderBy('name')->get();
 
         $stats = [
-            'totalItems'   => InventoryItem::count(),
-            'totalValue'   => (float) InventoryItem::selectRaw('SUM(cost * quantity) as val')->value('val') ?? 0,
-            'lowStock'     => InventoryItem::where('status', 'low_stock')->count(),
-            'outOfStock'   => InventoryItem::where('status', 'out_of_stock')->count(),
+            'totalItems' => InventoryItem::count(),
+            'totalValue' => (float) InventoryItem::selectRaw('SUM(cost * quantity) as val')->value('val') ?? 0,
+            'lowStock' => InventoryItem::where('status', 'low_stock')->count(),
+            'outOfStock' => InventoryItem::where('status', 'out_of_stock')->count(),
         ];
 
         return response()->json([
-            'items'      => $items,
+            'items' => $items,
             'categories' => $categories,
-            'stats'      => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -686,7 +694,7 @@ class PanelApiController extends Controller
     public function storeInventoryCategory(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
@@ -701,7 +709,7 @@ class PanelApiController extends Controller
     public function updateInventoryCategory(Request $request, InventoryCategory $inventoryCategory)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
@@ -720,6 +728,7 @@ class PanelApiController extends Controller
         }
 
         $inventoryCategory->delete();
+
         return response()->json(['message' => 'Category deleted successfully.']);
     }
 
@@ -729,13 +738,13 @@ class PanelApiController extends Controller
     public function storeInventoryItem(Request $request)
     {
         $request->validate([
-            'category_id'   => 'required|exists:inventory_categories,id',
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'sku'           => 'nullable|string|max:255|unique:inventory_items,sku',
-            'unit'          => 'required|string|max:50',
-            'cost'          => 'required|numeric|min:0',
-            'quantity'      => 'required|integer|min:0',
+            'category_id' => 'required|exists:inventory_categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sku' => 'nullable|string|max:255|unique:inventory_items,sku',
+            'unit' => 'required|string|max:50',
+            'cost' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
             'reorder_level' => 'required|integer|min:0',
         ]);
 
@@ -749,13 +758,13 @@ class PanelApiController extends Controller
         // Log initial stock
         if ($item->quantity > 0) {
             InventoryLog::create([
-                'item_id'         => $item->id,
-                'user_id'         => auth()->id(),
-                'type'            => 'stock_in',
-                'quantity'        => $item->quantity,
+                'item_id' => $item->id,
+                'user_id' => auth()->id(),
+                'type' => 'stock_in',
+                'quantity' => $item->quantity,
                 'quantity_before' => 0,
-                'quantity_after'  => $item->quantity,
-                'notes'           => 'Initial stock on item creation.',
+                'quantity_after' => $item->quantity,
+                'notes' => 'Initial stock on item creation.',
             ]);
         }
 
@@ -768,12 +777,12 @@ class PanelApiController extends Controller
     public function updateInventoryItem(Request $request, InventoryItem $inventoryItem)
     {
         $request->validate([
-            'category_id'   => 'required|exists:inventory_categories,id',
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'sku'           => 'nullable|string|max:255|unique:inventory_items,sku,' . $inventoryItem->id,
-            'unit'          => 'required|string|max:50',
-            'cost'          => 'required|numeric|min:0',
+            'category_id' => 'required|exists:inventory_categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sku' => 'nullable|string|max:255|unique:inventory_items,sku,'.$inventoryItem->id,
+            'unit' => 'required|string|max:50',
+            'cost' => 'required|numeric|min:0',
             'reorder_level' => 'required|integer|min:0',
         ]);
 
@@ -793,6 +802,7 @@ class PanelApiController extends Controller
     public function destroyInventoryItem(InventoryItem $inventoryItem)
     {
         $inventoryItem->delete();
+
         return response()->json(['message' => 'Item deleted successfully.']);
     }
 
@@ -802,9 +812,9 @@ class PanelApiController extends Controller
     public function adjustStock(Request $request, InventoryItem $inventoryItem)
     {
         $request->validate([
-            'type'     => 'required|in:stock_in,stock_out,adjustment',
+            'type' => 'required|in:stock_in,stock_out,adjustment',
             'quantity' => 'required|integer|min:1',
-            'notes'    => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         $before = $inventoryItem->quantity;
@@ -813,7 +823,7 @@ class PanelApiController extends Controller
             $inventoryItem->quantity += $request->quantity;
         } elseif ($request->type === 'stock_out') {
             if ($request->quantity > $inventoryItem->quantity) {
-                return response()->json(['message' => 'Insufficient stock. Current quantity is ' . $inventoryItem->quantity . '.'], 422);
+                return response()->json(['message' => 'Insufficient stock. Current quantity is '.$inventoryItem->quantity.'.'], 422);
             }
             $inventoryItem->quantity -= $request->quantity;
         } else {
@@ -825,13 +835,13 @@ class PanelApiController extends Controller
         $inventoryItem->refreshStatus();
 
         InventoryLog::create([
-            'item_id'         => $inventoryItem->id,
-            'user_id'         => auth()->id(),
-            'type'            => $request->type,
-            'quantity'        => $request->type === 'stock_out' ? -$request->quantity : $request->quantity,
+            'item_id' => $inventoryItem->id,
+            'user_id' => auth()->id(),
+            'type' => $request->type,
+            'quantity' => $request->type === 'stock_out' ? -$request->quantity : $request->quantity,
             'quantity_before' => $before,
-            'quantity_after'  => $inventoryItem->quantity,
-            'notes'           => $request->notes,
+            'quantity_after' => $inventoryItem->quantity,
+            'notes' => $request->notes,
         ]);
 
         // Notify admins if stock is now low or out
@@ -839,7 +849,7 @@ class PanelApiController extends Controller
             Notification::notifyAdmins(
                 'low_stock',
                 'Low Stock Alert',
-                $inventoryItem->name . ' is running low — only ' . $inventoryItem->quantity . ' ' . $inventoryItem->unit . ' remaining.',
+                $inventoryItem->name.' is running low — only '.$inventoryItem->quantity.' '.$inventoryItem->unit.' remaining.',
                 'fa-solid fa-triangle-exclamation',
                 'warning',
                 '/panel/inventory',
@@ -849,7 +859,7 @@ class PanelApiController extends Controller
             Notification::notifyAdmins(
                 'out_of_stock',
                 'Out of Stock',
-                $inventoryItem->name . ' is now out of stock!',
+                $inventoryItem->name.' is now out of stock!',
                 'fa-solid fa-box-open',
                 'danger',
                 '/panel/inventory',
@@ -897,7 +907,7 @@ class PanelApiController extends Controller
         $notifications = $query->paginate(20)->withQueryString();
 
         $stats = [
-            'total'  => Notification::where('user_id', auth()->id())->count(),
+            'total' => Notification::where('user_id', auth()->id())->count(),
             'unread' => Notification::where('user_id', auth()->id())->unread()->count(),
         ];
 
@@ -987,8 +997,8 @@ class PanelApiController extends Controller
 
         $data = [
             'profile' => [
-                'id'    => $user->id,
-                'name'  => $user->name,
+                'id' => $user->id,
+                'name' => $user->name,
                 'email' => $user->email,
             ],
             'role' => $user->isAdmin() ? 'admin' : 'staff',
@@ -996,7 +1006,11 @@ class PanelApiController extends Controller
 
         // Only admins get business settings
         if ($user->isAdmin()) {
-            $data['business'] = Setting::allAsArray();
+            $business = Setting::allAsArray();
+            if (! empty($business['business_logo'])) {
+                $business['business_logo_url'] = asset('storage/'.$business['business_logo']);
+            }
+            $data['business'] = $business;
         }
 
         return response()->json($data);
@@ -1010,8 +1024,8 @@ class PanelApiController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
         ]);
 
         $user->update($request->only('name', 'email'));
@@ -1026,12 +1040,12 @@ class PanelApiController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password'         => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = auth()->user();
 
-        if (!password_verify($request->current_password, $user->password)) {
+        if (! password_verify($request->current_password, $user->password)) {
             return response()->json(['message' => 'Current password is incorrect.'], 422);
         }
 
@@ -1046,21 +1060,35 @@ class PanelApiController extends Controller
     public function updateBusinessSettings(Request $request)
     {
         $request->validate([
-            'business_name'    => 'required|string|max:255',
-            'business_email'   => 'required|email|max:255',
-            'business_phone'   => 'required|string|max:50',
+            'business_name' => 'required|string|max:255',
+            'app_name_first' => 'nullable|string|max:50',
+            'app_name_last' => 'nullable|string|max:50',
+            'business_email' => 'required|email|max:255',
+            'business_phone' => 'required|string|max:50',
             'business_address' => 'required|string|max:500',
-            'opening_time'     => 'required|date_format:H:i',
-            'closing_time'     => 'required|date_format:H:i',
-            'slot_duration'    => 'required|integer|min:10|max:120',
-            'slot_capacity'    => 'required|integer|min:1|max:20',
-            'currency'         => 'required|string|max:10',
-            'timezone'         => 'required|string|max:100',
+            'opening_time' => 'required|date_format:H:i',
+            'closing_time' => 'required|date_format:H:i',
+            'slot_duration' => 'required|integer|min:10|max:120',
+            'slot_capacity' => 'required|integer|min:1|max:20',
+            'currency' => 'required|string|max:10',
+            'timezone' => 'required|string|max:100',
             'show_emergency_phone' => 'nullable|in:0,1',
+            'business_logo' => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
         ]);
 
+        // Handle logo upload
+        if ($request->hasFile('business_logo')) {
+            $oldLogo = Setting::get('business_logo');
+            if ($oldLogo && \Illuminate\Support\Facades\Storage::disk('public')->exists($oldLogo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldLogo);
+            }
+            $path = $request->file('business_logo')->store('logos', 'public');
+            Setting::set('business_logo', $path);
+        }
+
         $keys = [
-            'business_name', 'business_email', 'business_phone', 'business_address',
+            'business_name', 'app_name_first', 'app_name_last',
+            'business_email', 'business_phone', 'business_address',
             'opening_time', 'closing_time', 'slot_duration', 'slot_capacity',
             'currency', 'timezone', 'show_emergency_phone',
         ];
@@ -1074,9 +1102,19 @@ class PanelApiController extends Controller
         return response()->json(['message' => 'Business settings updated successfully.']);
     }
 
-    /* ================================================================
-     *  USERS MANAGEMENT (Admin only)
-     * ================================================================ */
+    /**
+     * Remove the business logo
+     */
+    public function removeLogo()
+    {
+        $logo = Setting::get('business_logo');
+        if ($logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($logo)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($logo);
+        }
+        Setting::set('business_logo', null);
+
+        return response()->json(['message' => 'Logo removed successfully.']);
+    }
 
     /**
      * List all users with roles
@@ -1089,7 +1127,7 @@ class PanelApiController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -1101,9 +1139,9 @@ class PanelApiController extends Controller
         $roles = Role::orderBy('id')->get();
 
         $stats = [
-            'total'  => User::count(),
+            'total' => User::count(),
             'admins' => User::where('role_id', 2)->count(),
-            'staff'  => User::where('role_id', 3)->count(),
+            'staff' => User::where('role_id', 3)->count(),
         ];
 
         return response()->json([
@@ -1119,17 +1157,17 @@ class PanelApiController extends Controller
     public function storeUser(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|max:255|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
-            'role_id'  => 'required|exists:roles,id',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => bcrypt($request->password),
-            'role_id'  => $request->role_id,
+            'role_id' => $request->role_id,
         ]);
 
         return response()->json(['message' => 'User created successfully.', 'user' => $user->load('role')]);
@@ -1141,9 +1179,9 @@ class PanelApiController extends Controller
     public function updateUser(Request $request, User $user)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role_id'  => 'required|exists:roles,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'role_id' => 'required|exists:roles,id',
             'password' => 'nullable|string|min:8',
         ]);
 
@@ -1173,15 +1211,17 @@ class PanelApiController extends Controller
         return response()->json(['message' => 'User deleted successfully.']);
     }
 
-    // ───────────────────────────────────────────────
-    //  EXPORT DAILY REPORT (CSV)
-    // ───────────────────────────────────────────────
-
+    /**
+     * Export Dailty
+     * Summary of exportDailyReport
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function exportDailyReport()
     {
         $today = today();
         $todayLabel = $today->format('M d, Y');
-        $filename = 'jnj-daily-report-' . $today->format('Y-m-d') . '.csv';
+        $filename = 'jnj-daily-report-'.$today->format('Y-m-d').'.csv';
 
         // ── Sales data ──
         $sales = Appointment::completed()
@@ -1199,37 +1239,37 @@ class PanelApiController extends Controller
             ->orderBy('time')
             ->get();
 
-        $scheduled   = $appointments->where('status', 'scheduled')->count();
-        $inProgress  = $appointments->where('status', 'in_progress')->count();
-        $completed   = $appointments->where('status', 'completed')->count();
-        $cancelled   = $appointments->where('status', 'cancelled')->count();
+        $scheduled = $appointments->where('status', 'scheduled')->count();
+        $inProgress = $appointments->where('status', 'in_progress')->count();
+        $completed = $appointments->where('status', 'completed')->count();
+        $cancelled = $appointments->where('status', 'cancelled')->count();
 
         // ── Inventory data ──
         $inventoryItems = InventoryItem::with('category')->orderBy('name')->get();
-        $totalInventoryValue = $inventoryItems->sum(fn($i) => $i->cost * $i->quantity);
-        $lowStock    = $inventoryItems->where('status', 'low_stock')->count();
-        $outOfStock  = $inventoryItems->where('status', 'out_of_stock')->count();
+        $totalInventoryValue = $inventoryItems->sum(fn ($i) => $i->cost * $i->quantity);
+        $lowStock = $inventoryItems->where('status', 'low_stock')->count();
+        $outOfStock = $inventoryItems->where('status', 'out_of_stock')->count();
 
         // ── Build CSV ──
         $lines = [];
 
         // Header
         $lines[] = 'JNJ Auto Car Wash - Daily Report';
-        $lines[] = 'Generated: ' . now()->format('M d, Y h:i A');
-        $lines[] = 'Report Date: ' . $todayLabel;
+        $lines[] = 'Generated: '.now()->format('M d, Y h:i A');
+        $lines[] = 'Report Date: '.$todayLabel;
         $lines[] = '';
 
         // Summary
         $lines[] = '=== DAILY SUMMARY ===';
-        $lines[] = 'Total Revenue,"' . number_format($todayRevenue, 2) . '"';
-        $lines[] = 'Completed Transactions,' . $todayTransactions;
-        $lines[] = 'Average Ticket,"' . ($todayTransactions > 0 ? number_format($todayRevenue / $todayTransactions, 2) : '0.00') . '"';
+        $lines[] = 'Total Revenue,"'.number_format($todayRevenue, 2).'"';
+        $lines[] = 'Completed Transactions,'.$todayTransactions;
+        $lines[] = 'Average Ticket,"'.($todayTransactions > 0 ? number_format($todayRevenue / $todayTransactions, 2) : '0.00').'"';
         $lines[] = '';
-        $lines[] = 'Scheduled,' . $scheduled;
-        $lines[] = 'In Progress,' . $inProgress;
-        $lines[] = 'Completed,' . $completed;
-        $lines[] = 'Cancelled,' . $cancelled;
-        $lines[] = 'Total Appointments,' . $appointments->count();
+        $lines[] = 'Scheduled,'.$scheduled;
+        $lines[] = 'In Progress,'.$inProgress;
+        $lines[] = 'Completed,'.$completed;
+        $lines[] = 'Cancelled,'.$cancelled;
+        $lines[] = 'Total Appointments,'.$appointments->count();
         $lines[] = '';
 
         // Sales transactions
@@ -1238,11 +1278,11 @@ class PanelApiController extends Controller
         foreach ($sales as $sale) {
             $lines[] = implode(',', [
                 $sale->id,
-                '"' . str_replace('"', '""', $sale->customer_name ?? '') . '"',
-                '"' . str_replace('"', '""', $sale->customer_email ?? '') . '"',
-                '"' . str_replace('"', '""', $sale->customer_phone ?? '') . '"',
-                '"' . str_replace('"', '""', $sale->service->name ?? '—') . '"',
-                '"' . str_replace('"', '""', $sale->size->name ?? '—') . '"',
+                '"'.str_replace('"', '""', $sale->customer_name ?? '').'"',
+                '"'.str_replace('"', '""', $sale->customer_email ?? '').'"',
+                '"'.str_replace('"', '""', $sale->customer_phone ?? '').'"',
+                '"'.str_replace('"', '""', $sale->service->name ?? '—').'"',
+                '"'.str_replace('"', '""', $sale->size->name ?? '—').'"',
                 $sale->time ?? '',
                 $sale->completed_at ? Carbon::parse($sale->completed_at)->format('h:i A') : '',
                 $sale->amount ?? 0,
@@ -1252,28 +1292,28 @@ class PanelApiController extends Controller
 
         // Inventory
         $lines[] = '=== CURRENT INVENTORY ===';
-        $lines[] = 'Total Items,' . $inventoryItems->count();
-        $lines[] = 'Total Inventory Value,"' . number_format($totalInventoryValue, 2) . '"';
-        $lines[] = 'Low Stock Items,' . $lowStock;
-        $lines[] = 'Out of Stock Items,' . $outOfStock;
+        $lines[] = 'Total Items,'.$inventoryItems->count();
+        $lines[] = 'Total Inventory Value,"'.number_format($totalInventoryValue, 2).'"';
+        $lines[] = 'Low Stock Items,'.$lowStock;
+        $lines[] = 'Out of Stock Items,'.$outOfStock;
         $lines[] = '';
         $lines[] = 'Item,Category,SKU,Quantity,Unit,Cost,Value,Reorder Level,Status';
         foreach ($inventoryItems as $item) {
             $value = $item->cost * $item->quantity;
-            $statusLabel = match($item->status) {
-                'in_stock'     => 'In Stock',
-                'low_stock'    => 'Low Stock',
+            $statusLabel = match ($item->status) {
+                'in_stock' => 'In Stock',
+                'low_stock' => 'Low Stock',
                 'out_of_stock' => 'Out of Stock',
-                default        => $item->status,
+                default => $item->status,
             };
             $lines[] = implode(',', [
-                '"' . str_replace('"', '""', $item->name) . '"',
-                '"' . str_replace('"', '""', $item->category->name ?? '—') . '"',
-                '"' . str_replace('"', '""', $item->sku ?? '') . '"',
+                '"'.str_replace('"', '""', $item->name).'"',
+                '"'.str_replace('"', '""', $item->category->name ?? '—').'"',
+                '"'.str_replace('"', '""', $item->sku ?? '').'"',
                 $item->quantity,
-                '"' . ($item->unit ?? 'pcs') . '"',
+                '"'.($item->unit ?? 'pcs').'"',
                 $item->cost ?? 0,
-                '"' . number_format($value, 2) . '"',
+                '"'.number_format($value, 2).'"',
                 $item->reorder_level ?? 0,
                 $statusLabel,
             ]);
@@ -1282,8 +1322,8 @@ class PanelApiController extends Controller
         $csv = implode("\n", $lines);
 
         return response($csv, 200, [
-            'Content-Type'        => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 }

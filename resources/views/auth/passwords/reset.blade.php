@@ -9,13 +9,17 @@
                         <div class="card-body p-4 p-md-5">
                             <div class="text-center mb-4">
                                 <div class="d-flex justify-content-center mb-2">
-                                    <div class="brand-icon-box bg-primary text-white auth-logo">
-                                        <i class="fa-solid fa-droplet"></i>
+                                    <div class="brand-icon-box bg-primary text-white auth-logo overflow-hidden">
+                                        @if(!empty($settings['business_logo_url']))
+                                            <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                                        @else
+                                            <i class="fa-solid fa-droplet"></i>
+                                        @endif
                                     </div>
                                 </div>
 
                                 <div class="fw-bold fs-3">
-                                    <span class="text-primary">JNJ</span><span class="text-dark">Auto</span>
+                                    <span class="text-primary">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span class="text-dark">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
                                 </div>
 
                                 <div class="text-secondary small">
@@ -81,7 +85,7 @@
                                 </button>
 
                                 <div class="text-center text-secondary small mt-3">
-                                    © {{ date('Y') }} JNJ CarWash
+                                    &copy; {{ date('Y') }} {{ $settings['business_name'] ?? 'JNJ CarWash' }}
                                 </div>
                             </form>
 

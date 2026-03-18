@@ -18,11 +18,15 @@
     <nav class="navbar navbar-expand-lg fixed-top py-3 border-bottom shadow-sm bg-white">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
-                <div class="brand-icon-box bg-primary text-white">
-                    <i class="fa-solid fa-droplet"></i>
+                <div class="brand-icon-box bg-primary text-white overflow-hidden">
+                    @if(!empty($settings['business_logo_url']))
+                        <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                    @else
+                        <i class="fa-solid fa-droplet"></i>
+                    @endif
                 </div>
-                <span class="fw-bold fs-3 text-primary">
-                    JNJ<span class="text-dark">Auto</span>
+                <span class="fw-bold fs-3">
+                    <span class="text-primary">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span class="text-dark">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
                 </span>
             </a>
 
@@ -78,11 +82,15 @@
                 {{-- Brand --}}
                 <div class="col-md-4">
                     <h5 class="fw-bold d-flex align-items-center gap-2">
-                        <div class="brand-icon-box text-white">
-                            <i class="fa-solid fa-droplet"></i>
+                        <div class="brand-icon-box text-white overflow-hidden">
+                            @if(!empty($settings['business_logo_url']))
+                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                            @else
+                                <i class="fa-solid fa-droplet"></i>
+                            @endif
                         </div>
-                        <span class="fw-bold fs-3 text-primary">
-                            JNJ<span class="text-dark">Auto</span>
+                        <span class="fw-bold fs-3">
+                            <span class="text-primary">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span class="text-dark">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
                         </span>
                     </h5>
                     <p class="text-secondary">

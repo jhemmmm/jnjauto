@@ -138,7 +138,7 @@
 
             <!-- Top Customers -->
             <div class="col-12 col-xl-6">
-                <section class="panel-card rounded-4 p-4 h-100">
+                <section class="panel-card rounded-4 p-4 h-100" style="max-height: 500px; overflow-y: auto">
                     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
                         <div>
                             <h3 class="h4 fw-bold mb-1">Top Customers</h3>

@@ -20,9 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Share settings with the public layout so nav/footer always have dynamic data
-        View::composer('layouts.app', function ($view) {
-            $view->with('settings', settings());
+        // Share settings with layouts so nav/footer/sidebar always have dynamic data
+        View::composer(['layouts.app', 'layouts.panel', 'auth.*'], function ($view) {
+            $allSettings = settings();
+            $allSettings['business_logo_url'] = ! empty($allSettings['business_logo'])
+                ? asset('storage/'.$allSettings['business_logo'])
+                : null;
+            $view->with('settings', $allSettings);
         });
     }
 }
