@@ -74,17 +74,24 @@
 
     {{-- Brands Section --}}
     <section class="bg-white py-4">
-        <div class="row justify-content-center text-center">
-            <div class="col-12">
-                <div class="text-uppercase">
-                    <h6 class="letter-spacing-2 text-secondary fw-semibold pb-4">We Wash All Major Brands</h6>
-                </div>
-                <div class="d-flex flex-wrap justify-content-center align-items-center gap-5 ">
-                    <img src="{{ asset('images/toyota.png') }}" class="img-fluid" style="height: 35px;" alt="Toyota" data-aos="fade-up" data-aos-delay="100">
-                    <img src="{{ asset('images/bmw.png') }}" class="img-fluid" style="height: 35px;" alt="BMW" data-aos="fade-up" data-aos-delay="200">
-                    <img src="{{ asset('images/audi.png') }}" class="img-fluid" style="height: 35px;" alt="Audi" data-aos="fade-up" data-aos-delay="300">
-                    <img src="{{ asset('images/mercedes.png') }}" class="img-fluid" style="height: 35px;" alt="Mercedes" data-aos="fade-up" data-aos-delay="400">
-                    <img src="{{ asset('images/ford.png') }}" class="img-fluid" style="height: 40px;" alt="Ford" data-aos="fade-up" data-aos-delay="500">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-12">
+                    <div class="text-uppercase">
+                        <h6 class="letter-spacing-2 text-secondary fw-semibold pb-4">We Wash All Major Brands</h6>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center align-items-center gap-5 ">
+                        <img src="{{ asset('images/toyota.png') }}" class="img-fluid" style="height: 35px;" alt="Toyota"
+                            data-aos="fade-up" data-aos-delay="100">
+                        <img src="{{ asset('images/bmw.png') }}" class="img-fluid" style="height: 35px;" alt="BMW"
+                            data-aos="fade-up" data-aos-delay="200">
+                        <img src="{{ asset('images/audi.png') }}" class="img-fluid" style="height: 35px;" alt="Audi"
+                            data-aos="fade-up" data-aos-delay="300">
+                        <img src="{{ asset('images/mercedes.png') }}" class="img-fluid" style="height: 35px;" alt="Mercedes"
+                            data-aos="fade-up" data-aos-delay="400">
+                        <img src="{{ asset('images/ford.png') }}" class="img-fluid" style="height: 40px;" alt="Ford"
+                            data-aos="fade-up" data-aos-delay="500">
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,20 +114,22 @@
 
             {{-- Service Cards --}}
             @forelse($services as $index => $service)
-                @if($loop->first)
+                @if ($loop->first)
                     <div class="row g-4">
                 @endif
 
                 <div class="col-12 col-md-6 {{ service_col_class($services->count()) }}">
-                    <div class="card hover-card h-100 text-center p-4 @if($index === 1) border-primary position-relative @endif">
+                    <div
+                        class="card hover-card h-100 text-center p-4 @if ($index === 1) border-primary position-relative @endif">
 
-                        @if($index === 1)
-                            <span class="badge bg-primary position-absolute top-0 start-50 translate-middle px-3 py-2 rounded-pill">
+                        @if ($index === 1)
+                            <span
+                                class="badge bg-primary position-absolute top-0 start-50 translate-middle px-3 py-2 rounded-pill">
                                 Most Popular
                             </span>
                         @endif
 
-                        <div class="service-icon mb-3 @if($index === 1) mt-3 @endif">
+                        <div class="service-icon mb-3 @if ($index === 1) mt-3 @endif">
                             <i class="{{ service_icon($index) }} fs-1 text-primary"></i>
                         </div>
 
@@ -130,7 +139,7 @@
                             <h3 class="fw-bold text-primary mb-0 d-inline">{{ format_price($service->price) }}</h3>
                         </div>
 
-                        @if($service->description)
+                        @if ($service->description)
                             <p class="text-secondary small mb-4">{{ $service->description }}</p>
                         @endif
 
@@ -141,15 +150,15 @@
                     </div>
                 </div>
 
-                @if($loop->last)
-                    </div>
-                @endif
-            @empty
-                <div class="text-center py-5">
-                    <i class="fa-solid fa-car-side fa-3x text-secondary mb-3"></i>
-                    <p class="text-secondary fw-semibold">No services available yet. Check back soon!</p>
-                </div>
-            @endforelse
+                @if ($loop->last)
+        </div>
+        @endif
+    @empty
+        <div class="text-center py-5">
+            <i class="fa-solid fa-car-side fa-3x text-secondary mb-3"></i>
+            <p class="text-secondary fw-semibold">No services available yet. Check back soon!</p>
+        </div>
+        @endforelse
         </div>
     </section>
 
@@ -160,13 +169,15 @@
                 <!-- LEFT IMAGE -->
                 <div class="col-12 col-lg-6">
                     <div class="about-image-wrapper">
-                        <img src="{{ asset('images/about-carwash.jpg') }}" alt="JNJ CarWash Team" class="img-fluid rounded-4 shadow">
+                        <img src="{{ asset('images/about-carwash.jpg') }}" alt="JNJ CarWash Team"
+                            class="img-fluid rounded-4 shadow">
                     </div>
                 </div>
 
                 <!-- RIGHT CONTENT -->
                 <div class="col-12 col-lg-6">
-                    <h6 class="text-uppercase text-primary fw-bold mb-2">About {{ setting('business_name', 'JNJ Auto Car Wash') }}</h6>
+                    <h6 class="text-uppercase text-primary fw-bold mb-2">About
+                        {{ setting('business_name', 'JNJ Auto Car Wash') }}</h6>
 
                     <h2 class="display-4 fw-bold mb-3">
                         Professional Car Care <br>
@@ -174,7 +185,8 @@
                     </h2>
 
                     <p class="text-secondary mb-4">
-                        At {{ setting('business_name', 'JNJ Auto Car Wash') }}, we believe your car deserves more than just a rinse.
+                        At {{ setting('business_name', 'JNJ Auto Car Wash') }}, we believe your car deserves more than just
+                        a rinse.
                         Our trained professionals provide high-quality washing and detailing
                         services using premium products and modern equipment.
                     </p>
