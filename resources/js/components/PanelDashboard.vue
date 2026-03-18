@@ -12,7 +12,7 @@
                                 <span class="fw-bold small">Live Operations</span>
                             </div>
                             <h3 class="hero-title fw-bold mb-2">Welcome back, Admin</h3>
-                            <p class="mb-0 text-white-50 hero-copy small">Your real-time car wash command center — bookings, revenue, and stock updated live.</p>
+                            <p class="mb-0 text-white-50 hero-copy small">Take full control of your operations with a real-time overview of bookings, revenue streams, and inventory status. Make faster decisions, reduce downtime, and ensure every aspect of your car wash business is performing at its best.</p>
                         </div>
                         <div class="d-flex flex-wrap gap-2 mt-4">
                             <a href="/panel/appointments" class="btn btn-light rounded-4 px-3 py-2 fw-semibold text-info-emphasis btn-sm">

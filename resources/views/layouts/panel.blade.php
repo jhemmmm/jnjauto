@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $settings['business_name'] ?? config('app.name', 'Laravel') }}</title>
+    <title>{{ $settings['business_name'] ?? config('app.name', 'Laravel') }} - Panel</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,15 +25,19 @@
                 <div class="p-3 p-xl-4 h-100 d-flex flex-column">
 
                     <div class="d-flex align-items-center gap-3 px-2 mb-4">
-                        <div class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
-                            @if(!empty($settings['business_logo_url']))
-                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                        <div
+                            class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                            @if (!empty($settings['business_logo_url']))
+                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
+                                    style="object-fit: cover;" />
                             @else
                                 <i class="fa-solid fa-droplet"></i>
                             @endif
                         </div>
                         <div>
-                            <h1 class="h4 fw-bold mb-0"><span class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}</h1>
+                            <h1 class="h4 fw-bold mb-0"><span
+                                    class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}
+                            </h1>
                             <div class="small text-secondary">Admin Panel</div>
                         </div>
                     </div>
@@ -44,9 +48,11 @@
                         <div class="promo-card rounded-4 p-4 text-white shadow-sm">
                             <h3 class="h6 fw-bold mb-2">Need today's summary?</h3>
                             <p class="small mb-3 text-white-50">
-                                Generate a printable end-of-day report for bookings, walk-ins, active washers, and service revenue.
+                                Generate a printable end-of-day report for bookings, walk-ins, active washers, and
+                                service revenue.
                             </p>
-                            <a href="{{ route('panel.api.export.report') }}" class="btn btn-light fw-semibold rounded-4 px-3">
+                            <a href="{{ route('panel.api.export.report') }}"
+                                class="btn btn-light fw-semibold rounded-4 px-3">
                                 <i class="fa-solid fa-file-export me-2"></i>Export Report
                             </a>
                         </div>
@@ -56,22 +62,28 @@
             </aside>
 
             <!-- Mobile Sidebar -->
-            <div class="offcanvas offcanvas-start admin-offcanvas border-0" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+            <div class="offcanvas offcanvas-start admin-offcanvas border-0" tabindex="-1" id="mobileSidebar"
+                aria-labelledby="mobileSidebarLabel">
                 <div class="offcanvas-header px-3 pt-3 pb-2">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
-                            @if(!empty($settings['business_logo_url']))
-                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                        <div
+                            class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                            @if (!empty($settings['business_logo_url']))
+                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
+                                    style="object-fit: cover;" />
                             @else
                                 <i class="fa-solid fa-droplet"></i>
                             @endif
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-0" id="mobileSidebarLabel"><span class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}</h5>
+                            <h5 class="fw-bold mb-0" id="mobileSidebarLabel"><span
+                                    class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}
+                            </h5>
                             <div class="small text-secondary">Admin Panel</div>
                         </div>
                     </div>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
                 </div>
 
                 <div class="offcanvas-body px-3 pt-2 d-flex flex-column">
@@ -81,9 +93,11 @@
                         <div class="promo-card rounded-4 p-4 text-white shadow-sm">
                             <h3 class="h6 fw-bold mb-2">Need today's summary?</h3>
                             <p class="small mb-3 text-white-50">
-                                Generate a printable end-of-day report for bookings, walk-ins, active washers, and service revenue.
+                                Generate a printable end-of-day report for bookings, walk-ins, active washers, and
+                                service revenue.
                             </p>
-                            <a href="{{ route('panel.api.export.report') }}" class="btn btn-light fw-semibold rounded-4 px-3 w-100">
+                            <a href="{{ route('panel.api.export.report') }}"
+                                class="btn btn-light fw-semibold rounded-4 px-3 w-100">
                                 <i class="fa-solid fa-file-export me-2"></i>Export Report
                             </a>
                         </div>
@@ -96,19 +110,24 @@
                 <div class="p-3 p-md-4 p-xl-4">
                     <!-- Mobile topbar -->
                     <div class="d-flex d-lg-none align-items-center justify-content-between gap-3 mb-3 mobile-header">
-                        <button class="btn btn-light border rounded-4 px-3 py-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+                        <button class="btn btn-light border rounded-4 px-3 py-2" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
                             <i class="fa-solid fa-bars"></i>
                         </button>
 
                         <div class="d-flex align-items-center gap-2">
-                            <div class="brand-icon brand-icon-sm d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
-                                @if(!empty($settings['business_logo_url']))
-                                    <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100" style="object-fit: cover;" />
+                            <div
+                                class="brand-icon brand-icon-sm d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                                @if (!empty($settings['business_logo_url']))
+                                    <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
+                                        style="object-fit: cover;" />
                                 @else
                                     <i class="fa-solid fa-droplet"></i>
                                 @endif
                             </div>
-                            <div class="fw-bold"><span class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}</div>
+                            <div class="fw-bold"><span
+                                    class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}
+                            </div>
                         </div>
 
                         <notification-bell></notification-bell>
