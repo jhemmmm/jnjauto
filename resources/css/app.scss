@@ -27,7 +27,6 @@ body {
     height: 40px;
     text-align: center;
     background: $primary;
-    //background: linear-gradient(135deg, rgb(138 143 247), rgb(48 165 218));
 }
 
 .nav-link:hover {
@@ -267,6 +266,219 @@ body {
     color: rgba(33, 37, 41, 0.65);
 }
 
+.booking-hero {
+    background: linear-gradient(135deg, rgba(44, 165, 221, 0.06) 0%, rgba(44, 165, 221, 0.02) 100%);
+}
+
+.booking-badge {
+    background: rgba(44, 165, 221, 0.12);
+    color: var(--jnj-primary-dark, #1b88bb);
+}
+
+.stepper-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid #dee2e6;
+    color: #adb5bd;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.stepper-step.active .stepper-circle,
+.stepper-step.done .stepper-circle {
+    border-color: $primary;
+    background: $primary;
+    color: #fff;
+}
+
+.stepper-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #adb5bd;
+    margin-top: 6px;
+}
+
+.stepper-step.active .stepper-label {
+    color: #1b88bb;
+}
+
+.stepper-line {
+    height: 2px;
+    background: #dee2e6;
+    margin: 0 0.5rem;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+}
+
+.stepper-line.active {
+    background: $primary;
+}
+
+.svc-card {
+    padding: 1.25rem;
+    border-radius: 1rem;
+    border: 2px solid rgba(0, 0, 0, 0.06);
+    background: #fff;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.svc-card:hover {
+    border-color: rgba(44, 165, 221, 0.3);
+    box-shadow: 0 8px 25px rgba(44, 165, 221, 0.1);
+}
+
+.svc-card.active {
+    border-color: $primary;
+    background: rgba(44, 165, 221, 0.03);
+    box-shadow: 0 8px 25px rgba(44, 165, 221, 0.15);
+}
+
+.svc-card-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: $primary;
+    font-size: 1.2rem;
+}
+
+.svc-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(44, 165, 221, 0.1);
+    color: $primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.svc-card-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: $primary;
+}
+
+/* Size Buttons */
+.size-btn {
+    padding: 0.6rem 1.5rem;
+    border-radius: 50rem;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    background: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    color: #333;
+}
+
+.size-btn:hover {
+    border-color: rgba(44, 165, 221, 0.4);
+    color: #1b88bb;
+}
+
+.size-btn.active {
+    border-color: $primary;
+    background: $primary;
+    color: #fff;
+}
+
+/* Time Slot Group */
+.slot-group-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+/* Time Buttons */
+.time-btn {
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.55rem 0.3rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.time-btn-label {
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.time-btn-cap {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.time-btn.open {
+    border-color: rgba(25, 135, 84, 0.2);
+}
+.time-btn.open:hover {
+    border-color: rgba(25, 135, 84, 0.5);
+    background: rgba(25, 135, 84, 0.04);
+}
+
+.time-btn.filling {
+    border-color: rgba(255, 193, 7, 0.35);
+}
+.time-btn.filling:hover {
+    border-color: rgba(255, 193, 7, 0.6);
+    background: rgba(255, 193, 7, 0.04);
+}
+
+.time-btn.unavailable {
+    opacity: 0.4;
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.time-btn.selected {
+    border-color: $primary;
+    background: rgba(44, 165, 221, 0.08);
+    box-shadow: 0 4px 15px rgba(44, 165, 221, 0.2);
+}
+
+/* Legend Dots */
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Input group fix */
+.input-group .input-group-text {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Success ring in modal */
+.success-ring {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #059669;
+    font-size: 1.8rem;
+}
+
 :root {
     --jnj-primary: #2ca5dd;
     --jnj-primary-dark: #1b88bb;
@@ -489,9 +701,6 @@ body.admin-body {
         font-size: 1.6rem;
     }
 }
-
-/* ── Page header bar ── */
-
 .page-header-bar {
     position: relative;
     padding-bottom: 1rem;
@@ -511,8 +720,6 @@ body.admin-body {
         align-self: flex-end;
     }
 }
-
-/* ── Dashboard specific ── */
 
 .stat-icon {
     width: 40px;
@@ -612,8 +819,6 @@ body.admin-body {
     border-top-right-radius: 0.75rem;
 }
 
-/* ── Dot-style badge overrides ── */
-
 .badge {
     display: inline-flex;
     align-items: center;
@@ -663,8 +868,6 @@ body.admin-body {
     color: #1a8ec5 !important;
 }
 .badge.text-bg-info .badge-dot { background: #1a8ec5; }
-
-/* ── Notification System ── */
 
 .notification-bell-wrapper {
     position: relative;
@@ -806,8 +1009,6 @@ body.admin-body {
     font-size: 0.9rem;
 }
 
-/* ── Improved transitions & polish ── */
-
 .panel-card {
     transition: box-shadow 0.2s ease;
 }
@@ -844,8 +1045,6 @@ body.admin-body {
     box-shadow: 0 0 0 0.2rem rgba(44, 165, 221, 0.15);
 }
 
-/* ── Pagination polish ── */
-
 .pagination .page-link {
     border-color: var(--jnj-line);
     color: var(--jnj-text);
@@ -869,14 +1068,10 @@ body.admin-body {
     color: var(--jnj-primary-dark);
 }
 
-/* ── Alert / flash polish ── */
-
 .alert {
     border: none;
     font-weight: 500;
 }
-
-/* ── Empty state icon helper ── */
 
 .empty-state-icon {
     width: 80px;
@@ -890,8 +1085,6 @@ body.admin-body {
     font-size: 1.5rem;
     margin-bottom: 1rem;
 }
-
-/* ── Modal polish ── */
 
 .modal-content {
     border: none;

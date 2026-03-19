@@ -31,19 +31,24 @@
                 <div class="p-3 p-xl-4 h-100 d-flex flex-column">
 
                     <div class="d-flex align-items-center gap-3 px-2 mb-4">
-                        <div
-                            class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
-                            @if (!empty($settings['business_logo_url']))
-                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
-                                    style="object-fit: cover;" />
-                            @else
-                                <i class="fa-solid fa-droplet"></i>
-                            @endif
-                        </div>
+                        <a href="{{ route('home') }}" class="text-decoration-none">
+                            <div
+                                class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                                @if (!empty($settings['business_logo_url']))
+                                    <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
+                                        style="object-fit: cover;" />
+                                @else
+                                    <i class="fa-solid fa-droplet"></i>
+                                @endif
+                            </div>
+                        </a>
                         <div>
-                            <h1 class="h4 fw-bold mb-0"><span
-                                    class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}
-                            </h1>
+                            <a href="{{ route('home') }}" class="text-decoration-none">
+                                <h1 class="h4 fw-bold mb-0"><span
+                                        class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span
+                                        class="text-black">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
+                                </h1>
+                            </a>
                             <div class="small text-secondary">Admin Panel</div>
                         </div>
                     </div>
@@ -72,19 +77,24 @@
                 aria-labelledby="mobileSidebarLabel">
                 <div class="offcanvas-header px-3 pt-3 pb-2">
                     <div class="d-flex align-items-center gap-3">
-                        <div
-                            class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
-                            @if (!empty($settings['business_logo_url']))
-                                <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
-                                    style="object-fit: cover;" />
-                            @else
-                                <i class="fa-solid fa-droplet"></i>
-                            @endif
-                        </div>
+                        <a href="{{ route('home') }}" class="text-decoration-none">
+                            <div
+                                class="brand-icon d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                                @if (!empty($settings['business_logo_url']))
+                                    <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
+                                        style="object-fit: cover;" />
+                                @else
+                                    <i class="fa-solid fa-droplet"></i>
+                                @endif
+                            </div>
+                        </a>
                         <div>
-                            <h5 class="fw-bold mb-0" id="mobileSidebarLabel"><span
-                                    class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}
-                            </h5>
+                            <a href="{{ route('home') }}" class="text-decoration-none">
+                                <h5 class="fw-bold mb-0" id="mobileSidebarLabel"><span
+                                        class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span
+                                        class="text-black">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
+                                </h5>
+                            </a>
                             <div class="small text-secondary">Admin Panel</div>
                         </div>
                     </div>
@@ -122,18 +132,23 @@
                         </button>
 
                         <div class="d-flex align-items-center gap-2">
-                            <div
-                                class="brand-icon brand-icon-sm d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
-                                @if (!empty($settings['business_logo_url']))
-                                    <img src="{{ $settings['business_logo_url'] }}" alt="Logo" class="w-100 h-100"
-                                        style="object-fit: cover;" />
-                                @else
-                                    <i class="fa-solid fa-droplet"></i>
-                                @endif
-                            </div>
-                            <div class="fw-bold"><span
-                                    class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span>{{ $settings['app_name_last'] ?? 'Auto' }}
-                            </div>
+                            <a href="{{ route('home') }}" class="text-decoration-none">
+                                <div
+                                    class="brand-icon brand-icon-sm d-inline-flex align-items-center justify-content-center rounded-4 overflow-hidden">
+                                    @if (!empty($settings['business_logo_url']))
+                                        <img src="{{ $settings['business_logo_url'] }}" alt="Logo"
+                                            class="w-100 h-100" style="object-fit: cover;" />
+                                    @else
+                                        <i class="fa-solid fa-droplet"></i>
+                                    @endif
+                                </div>
+                            </a>
+                            <a href="{{ route('home') }}" class="text-decoration-none">
+                                <div class="fw-bold"><span
+                                        class="text-info-emphasis">{{ $settings['app_name_first'] ?? 'JNJ' }}</span><span
+                                        class="text-black">{{ $settings['app_name_last'] ?? 'Auto' }}</span>
+                                </div>
+                            </a>
                         </div>
 
                         <notification-bell></notification-bell>

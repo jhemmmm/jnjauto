@@ -1,208 +1,372 @@
 <template>
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-4 mb-2">
-                <div class="card hover-card border-0 rounded-4 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="step-dot mb-3">
-                            <i class="fa-regular fa-calendar-days"></i>
-                        </div>
-                        <div class="fw-bold">Pick a date</div>
-                        <div class="text-muted small">Only future dates allowed.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 mb-2">
-                <div class="card hover-card border-0 rounded-4 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="step-dot mb-3">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div class="fw-bold">Choose an open slot</div>
-                        <div class="text-muted small">Full & past slots auto-disable.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 mb-2">
-                <div class="card hover-card border-0 rounded-4 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="step-dot mb-3">
-                            <i class="fa-solid fa-receipt"></i>
-                        </div>
-                        <div class="fw-bold">Confirm & track sales</div>
-                        <div class="text-muted small">Perfect for dashboard reporting.</div>
-                    </div>
-                </div>
+    <div class="booking-page">
+        <!-- ── Page Header ── -->
+        <div class="booking-hero text-center py-5">
+            <div class="container">
+                <span class="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 mb-3 small fw-semibold booking-badge">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    Online Booking
+                </span>
+                <h1 class="display-5 fw-bold mb-2">Book an Appointment</h1>
+                <p class="text-muted mb-0">Schedule your car wash in three easy steps</p>
             </div>
         </div>
 
-        <div class="row justify-content-center">
-            <!-- Booking -->
-            <div class="col-12 col-md-8 mb-2">
-                <div class="card border-0 rounded-4 shadow-sm">
-                    <div class="card-body p-4">
-                        <h2 class="h4 fw-bold mb-1">Book an Appointment</h2>
-                        <hr class="my-3" />
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-5">
-                                <label class="form-label fw-semibold">Select Date</label>
-                                <input v-model="state.selectedDate" :min="new Date().toISOString().split('T')[0]" id="dateInput" type="date" class="form-control" />
+        <div class="container pb-5">
+            <!-- ── Step Progress ── -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="stepper d-flex align-items-start">
+                        <div class="stepper-step text-center flex-shrink-0" :class="{ active: step >= 1, done: step > 1 }" role="button" @click="goToStep(1)">
+                            <div class="stepper-circle mx-auto">
+                                <i v-if="step > 1" class="fa-solid fa-check"></i>
+                                <span v-else>1</span>
                             </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Service</label>
-                                <select v-model="state.selectedService" id="serviceInput" class="form-select">
-                                    <option v-for="service in services" :key="service.id" :value="service.id">{{ service.name }} — ₱{{ Number(service.price).toLocaleString("en-PH", { minimumFractionDigits: 2 }) }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Vehicle Size</label>
-                                <select v-model="state.selectedSize" id="sizeInput" class="form-select">
-                                    <option v-for="size in sizes" :key="size.id" :value="size.id">{{ size.name }}</option>
-                                </select>
-                            </div>
+                            <span class="stepper-label">Service</span>
                         </div>
-
-                        <div class="mt-4">
-                            <div class="fw-bold">Available Time Slots</div>
+                        <div class="stepper-line flex-fill" :class="{ active: step > 1 }"></div>
+                        <div class="stepper-step text-center flex-shrink-0" :class="{ active: step >= 2, done: step > 2 }" :role="step >= 2 ? 'button' : ''" @click="goToStep(2)">
+                            <div class="stepper-circle mx-auto">
+                                <i v-if="step > 2" class="fa-solid fa-check"></i>
+                                <span v-else>2</span>
+                            </div>
+                            <span class="stepper-label">Schedule</span>
                         </div>
+                        <div class="stepper-line flex-fill" :class="{ active: step > 2 }"></div>
+                        <div class="stepper-step text-center flex-shrink-0" :class="{ active: step >= 3 }">
+                            <div class="stepper-circle mx-auto">3</div>
+                            <span class="stepper-label">Confirm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <overlay :show="loading">
-                            <div class="row mt-2">
-                                <div v-for="(slot, index) in state.slots" class="col-12 col-md-6 col-xl-4 mb-2" :key="index">
-                                    <button type="button" class="slot" :class="{ active: state.selectedSlot === slot.time }" :disabled="slot.available == 0 || slot.past" @click="state.selectedSlot = slot.available != 0 ? slot.time : null">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="slot-time">
-                                                <i class="fa-regular fa-clock me-2"></i>
-                                                {{ slot.time }}
+            <!-- ═══════════════════════════════ -->
+            <!-- STEP 1 – Service & Vehicle      -->
+            <!-- ═══════════════════════════════ -->
+            <div v-show="step === 1">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10">
+                        <!-- Services -->
+                        <div class="card border-0 rounded-4 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-solid fa-sparkles text-primary me-2"></i>
+                                    Choose a Service
+                                </h5>
+                                <p class="text-muted small mb-3">Select the wash package that best suits your needs.</p>
+                                <div class="row g-3">
+                                    <div v-for="(service, idx) in services" :key="service.id" class="col-12 col-sm-6 col-xl-3">
+                                        <div class="svc-card h-100" :class="{ active: state.selectedService === service.id }" @click="state.selectedService = service.id" role="button">
+                                            <div class="svc-card-check" v-if="state.selectedService === service.id">
+                                                <i class="fa-solid fa-circle-check"></i>
                                             </div>
-                                            <span v-if="slot.past" class="badge rounded-pill text-bg-secondary">PAST</span>
-                                            <span v-else-if="slot.available != 0" class="badge rounded-pill text-bg-success">OPEN</span>
-                                            <span v-else class="badge rounded-pill text-bg-danger">FULL</span>
+                                            <div class="svc-card-icon mb-3">
+                                                <i :class="serviceIcon(idx)"></i>
+                                            </div>
+                                            <div class="fw-bold mb-1">{{ service.name }}</div>
+                                            <div class="text-muted small mb-2" v-if="service.description">{{ service.description }}</div>
+                                            <div class="mt-auto">
+                                                <span class="svc-card-price">₱{{ formatPrice(service.price) }}</span>
+                                            </div>
                                         </div>
-                                        <div class="slot-meta mt-1">Available: {{ slot.available }}/{{ config.SLOT_CAPACITY }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Size -->
+                        <div class="card border-0 rounded-4 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-solid fa-car text-primary me-2"></i>
+                                    Vehicle Size
+                                </h5>
+                                <p class="text-muted small mb-3">Pricing adjusts based on your vehicle size.</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button v-for="size in sizes" :key="size.id" type="button" class="size-btn" :class="{ active: state.selectedSize === size.id }" @click="state.selectedSize = size.id">
+                                        {{ size.name }}
+                                        <span v-if="size.multiplier && Number(size.multiplier) !== 1" class="opacity-75 ms-1 small">×{{ size.multiplier }}</span>
                                     </button>
                                 </div>
                             </div>
-                        </overlay>
+                        </div>
+
+                        <!-- Step 1 Footer -->
+                        <div class="d-flex align-items-center justify-content-between rounded-4 bg-light p-3 px-4">
+                            <div>
+                                <div class="text-muted small">Estimated Price</div>
+                                <div class="h4 fw-bold text-primary mb-0">₱{{ computedPrice }}</div>
+                            </div>
+                            <button class="btn btn-primary btn-lg rounded-pill px-4" @click="goToStep(2)">
+                                Continue
+                                <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Booking Summary -->
-            <div class="col-12 col-md-4 mb-2">
-                <div class="card border-0 rounded-4 shadow-sm sticky-top" style="top: 100px">
-                    <overlay :show="loading">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div class="fw-bold">Booking Summary</div>
-                                <span class="badge rounded-pill text-bg-primary text-white">
-                                    <i class="fa-solid fa-wand-sparkles"></i>
-                                    Live
-                                </span>
-                            </div>
 
-                            <div class="p-3 rounded-4 bg-light mb-3">
-                                <div class="summary-line">
-                                    <span>Date</span>
-                                    <span class="fw-bold" id="sumDate">
-                                        {{ state.selectedDate }}
-                                    </span>
-                                </div>
-                                <div class="summary-line mt-2">
-                                    <span>Time</span>
-                                    <span class="fw-bold" id="sumTime">
-                                        {{ state.selectedSlot || "-" }}
-                                    </span>
-                                </div>
-                                <div class="summary-line mt-2">
-                                    <span>Service</span>
-                                    <span class="fw-bold" id="sumService">
-                                        {{ services.find((s) => s.id === state.selectedService)?.name || "-" }}
-                                    </span>
-                                </div>
-                                <div class="summary-line mt-2">
-                                    <span>Vehicle Type</span>
-                                    <span class="fw-bold" id="sumType">
-                                        {{ sizes.find((s) => s.id === state.selectedSize)?.name || "-" }}
-                                    </span>
-                                </div>
-                                <hr class="my-2" />
-                                <div class="summary-line">
-                                    <span class="fw-bold">Total Price</span>
-                                    <span class="fw-bold text-primary fs-5" id="sumPrice">₱{{ computedPrice }}</span>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Full Name</label>
-                                <input v-model="form.name" class="form-control" required placeholder="Juan Dela Cruz" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Email Address</label>
-                                <input v-model="form.email" type="email" class="form-control" required placeholder="juan@example.com" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Mobile Number</label>
-                                <input v-model="form.phone" class="form-control" required placeholder="09xx xxx xxxx" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Notes (Optional)</label>
-                                <textarea v-model="form.notes" class="form-control" rows="3" placeholder="Optional notes..."></textarea>
-                            </div>
-
-                            <button @click="submit" id="submitBtn" class="btn btn-primary btn-round w-100" type="submit" :disabled="!canConfirm">
-                                <i class="bi bi-check2-circle me-1"></i>
-                                Confirm Booking
-                            </button>
-
-                            <div class="text-center small text-muted mt-2">Select a time slot to enable.</div>
-
-                            <hr class="my-4" />
-
-                            <div class="d-flex gap-2">
-                                <a class="flex-fill p-3 rounded-4 bg-light text-decoration-none" href="https://m.me/jnjauto" target="_blank">
-                                    <div class="small text-muted">Support</div>
-                                    <div class="fw-semibold">
-                                        <i class="fa-brands fa-facebook-messenger"></i>
-                                        Facebook
+            <!-- ═══════════════════════════════ -->
+            <!-- STEP 2 – Date & Time            -->
+            <!-- ═══════════════════════════════ -->
+            <div v-show="step === 2">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10">
+                        <!-- Date -->
+                        <div class="card border-0 rounded-4 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-regular fa-calendar text-primary me-2"></i>
+                                    Select Date
+                                </h5>
+                                <p class="text-muted small mb-3">Choose your preferred appointment date.</p>
+                                <div class="row align-items-center">
+                                    <div class="col-md-5 mb-2 mb-md-0">
+                                        <input v-model="state.selectedDate" :min="new Date().toISOString().split('T')[0]" type="date" class="form-control form-control-lg" />
                                     </div>
-                                </a>
-                                <a class="flex-fill p-3 rounded-4 bg-light text-decoration-none" href="tel:09xx" target="_blank">
-                                    <div class="small text-muted">Hotline</div>
-                                    <div class="fw-semibold">
-                                        <i class="fa-solid fa-headset"></i>
-                                        09xx
+                                    <div class="col-md-7">
+                                        <span class="text-muted">
+                                            <i class="fa-regular fa-calendar-check me-1"></i>
+                                            {{ formattedDate }}
+                                        </span>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         </div>
-                    </overlay>
+
+                        <!-- Time Slots -->
+                        <div class="card border-0 rounded-4 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                                    <h5 class="fw-bold mb-0">
+                                        <i class="fa-regular fa-clock text-primary me-2"></i>
+                                        Available Times
+                                    </h5>
+                                    <div class="d-flex gap-3 small text-muted">
+                                        <span class="d-inline-flex align-items-center gap-1">
+                                            <span class="legend-dot bg-success"></span>
+                                            Open
+                                        </span>
+                                        <span class="d-inline-flex align-items-center gap-1">
+                                            <span class="legend-dot bg-warning"></span>
+                                            Filling
+                                        </span>
+                                        <span class="d-inline-flex align-items-center gap-1">
+                                            <span class="legend-dot bg-secondary"></span>
+                                            Unavailable
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <overlay :show="loading">
+                                    <div v-if="morningSlots.length" class="mb-4">
+                                        <div class="slot-group-label">
+                                            <i class="fa-solid fa-sun"></i>
+                                            Morning
+                                        </div>
+                                        <div class="row g-2">
+                                            <div v-for="slot in morningSlots" :key="slot.time" class="col-4 col-sm-3 col-lg-2">
+                                                <button type="button" class="time-btn w-100" :class="getSlotClass(slot)" :disabled="slot.available === 0 || slot.past" @click="selectSlot(slot)">
+                                                    <div class="time-btn-label">{{ formatTime12(slot.time) }}</div>
+                                                    <div class="time-btn-cap">{{ slot.available }}/{{ config.SLOT_CAPACITY }}</div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="afternoonSlots.length">
+                                        <div class="slot-group-label">
+                                            <i class="fa-solid fa-cloud-sun"></i>
+                                            Afternoon
+                                        </div>
+                                        <div class="row g-2">
+                                            <div v-for="slot in afternoonSlots" :key="slot.time" class="col-4 col-sm-3 col-lg-2">
+                                                <button type="button" class="time-btn w-100" :class="getSlotClass(slot)" :disabled="slot.available === 0 || slot.past" @click="selectSlot(slot)">
+                                                    <div class="time-btn-label">{{ formatTime12(slot.time) }}</div>
+                                                    <div class="time-btn-cap">{{ slot.available }}/{{ config.SLOT_CAPACITY }}</div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </overlay>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 Footer -->
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-light rounded-pill px-4" @click="goToStep(1)">
+                                <i class="fa-solid fa-arrow-left me-2"></i>
+                                Back
+                            </button>
+                            <button class="btn btn-primary btn-lg rounded-pill px-4" :disabled="!state.selectedSlot" @click="goToStep(3)">
+                                Continue
+                                <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════ -->
+            <!-- STEP 3 – Details & Confirm      -->
+            <!-- ═══════════════════════════════ -->
+            <div v-show="step === 3">
+                <div class="row justify-content-center">
+                    <!-- Customer Form -->
+                    <div class="col-12 col-lg-6 mb-4">
+                        <div class="card border-0 rounded-4 shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-regular fa-user text-primary me-2"></i>
+                                    Your Information
+                                </h5>
+                                <p class="text-muted small mb-4">We'll use this to confirm your booking.</p>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-regular fa-user text-muted"></i></span>
+                                        <input v-model="form.name" class="form-control" placeholder="Juan Dela Cruz" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-regular fa-envelope text-muted"></i></span>
+                                        <input v-model="form.email" type="email" class="form-control" placeholder="juan@example.com" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Mobile Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone text-muted"></i></span>
+                                        <input v-model="form.phone" class="form-control" placeholder="09xx xxx xxxx" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label fw-semibold small">
+                                        Notes
+                                        <span class="fw-normal text-muted">(optional)</span>
+                                    </label>
+                                    <textarea v-model="form.notes" class="form-control" rows="3" placeholder="Any special requests or instructions..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Sidebar -->
+                    <div class="col-12 col-lg-4 mb-4">
+                        <div class="card border-0 rounded-4 shadow-sm sticky-top" style="top: 100px">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h5 class="fw-bold mb-0">Booking Summary</h5>
+                                    <span class="badge rounded-pill text-bg-primary">
+                                        <span class="badge-dot"></span>
+                                        Live
+                                    </span>
+                                </div>
+
+                                <div class="rounded-4 bg-light p-3 mb-3">
+                                    <div class="summary-line">
+                                        <span>Service</span>
+                                        <span class="fw-bold text-end">{{ selectedServiceName }}</span>
+                                    </div>
+                                    <div class="summary-line mt-2">
+                                        <span>Vehicle</span>
+                                        <span class="fw-bold">{{ selectedSizeName }}</span>
+                                    </div>
+                                    <div class="summary-line mt-2">
+                                        <span>Date</span>
+                                        <span class="fw-bold">{{ shortDate }}</span>
+                                    </div>
+                                    <div class="summary-line mt-2">
+                                        <span>Time</span>
+                                        <span class="fw-bold">{{ state.selectedSlot ? formatTime12(state.selectedSlot) : "—" }}</span>
+                                    </div>
+                                    <hr class="my-2" />
+                                    <div class="summary-line">
+                                        <span class="fw-bold">Total</span>
+                                        <span class="fw-bold text-primary fs-5">₱{{ computedPrice }}</span>
+                                    </div>
+                                </div>
+
+                                <button @click="submit" class="btn btn-primary btn-lg w-100 rounded-pill" :disabled="!canConfirm || loading">
+                                    <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                                    <i v-else class="fa-solid fa-check me-2"></i>
+                                    Confirm Booking
+                                </button>
+                                <p class="text-center text-muted small mt-2 mb-0">
+                                    <i class="fa-solid fa-shield-halved me-1"></i>
+                                    No payment required to book
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+                                <div class="d-flex gap-2">
+                                    <a class="flex-fill p-2 rounded-3 bg-light text-decoration-none text-center small" href="https://m.me/jnjauto" target="_blank" rel="noopener noreferrer">
+                                        <i class="fa-brands fa-facebook-messenger text-primary"></i>
+                                        Messenger
+                                    </a>
+                                    <a class="flex-fill p-2 rounded-3 bg-light text-decoration-none text-center small" href="tel:09xx" rel="noopener noreferrer">
+                                        <i class="fa-solid fa-phone text-primary"></i>
+                                        Call Us
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 Back -->
+                    <div class="col-12 col-lg-10">
+                        <button class="btn btn-light rounded-pill px-4" @click="goToStep(2)">
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+                            Back
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Result Modal -->
+        <!-- ── Result Modal ── -->
         <div class="modal fade" id="appointmentModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <span v-if="error">Booking Failed</span>
-                            <span v-else>Booking Confirmed</span>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div v-if="error" class="modal-body text-center">
-                        <i class="fa-solid fa-circle-xmark text-danger fs-1 mb-3"></i>
-                        <p class="mb-0">{{ error }}</p>
-                    </div>
-                    <div v-else class="modal-body text-center">
-                        <i class="fa-solid fa-circle-check text-success fs-1 mb-3"></i>
-                        <p class="mb-0">Your appointment has been successfully booked.</p>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                <div class="modal-content border-0 rounded-4 shadow">
+                    <div class="modal-body text-center p-5">
+                        <template v-if="error">
+                            <div class="mb-3">
+                                <i class="fa-solid fa-circle-xmark text-danger" style="font-size: 3.5rem"></i>
+                            </div>
+                            <h4 class="fw-bold mb-2">Booking Failed</h4>
+                            <p class="text-muted mb-4">{{ error }}</p>
+                            <button class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal">Try Again</button>
+                        </template>
+                        <template v-else>
+                            <div class="mb-3">
+                                <div class="success-ring mx-auto">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                            </div>
+                            <h4 class="fw-bold mb-2">Booking Confirmed!</h4>
+                            <p class="text-muted mb-4">Your appointment has been successfully scheduled.</p>
+                            <div v-if="bookingConfirmation" class="rounded-4 bg-light p-3 text-start mb-4">
+                                <div class="summary-line">
+                                    <span>Service</span>
+                                    <span class="fw-bold">{{ bookingConfirmation.service }}</span>
+                                </div>
+                                <div class="summary-line mt-2">
+                                    <span>Date</span>
+                                    <span class="fw-bold">{{ bookingConfirmation.date }}</span>
+                                </div>
+                                <div class="summary-line mt-2">
+                                    <span>Time</span>
+                                    <span class="fw-bold">{{ bookingConfirmation.time }}</span>
+                                </div>
+                                <hr class="my-2" />
+                                <div class="summary-line">
+                                    <span class="fw-bold">Total</span>
+                                    <span class="fw-bold text-primary">₱{{ bookingConfirmation.price }}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary rounded-pill px-5" data-bs-dismiss="modal">Done</button>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -214,6 +378,8 @@
 export default {
     data() {
         return {
+            step: 1,
+
             config: {
                 OPEN_HOUR: 7,
                 OPEN_MINUTE: 0,
@@ -244,6 +410,7 @@ export default {
             modal: null,
             error: null,
             loading: true,
+            bookingConfirmation: null,
         };
     },
     mounted() {
@@ -256,6 +423,42 @@ export default {
         }, 1000 * 60);
     },
     methods: {
+        goToStep(n) {
+            if (n > this.step + 1) return;
+            if (n === 3 && !this.state.selectedSlot) return;
+            this.step = n;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+
+        formatTime12(time) {
+            const [h, m] = time.split(":").map(Number);
+            const ampm = h >= 12 ? "PM" : "AM";
+            const hour12 = h % 12 || 12;
+            return `${hour12}:${String(m).padStart(2, "0")} ${ampm}`;
+        },
+
+        selectSlot(slot) {
+            if (slot.available > 0 && !slot.past) {
+                this.state.selectedSlot = slot.time;
+            }
+        },
+
+        getSlotClass(slot) {
+            if (this.state.selectedSlot === slot.time) return "selected";
+            if (slot.past || slot.available === 0) return "unavailable";
+            if (slot.available < this.config.SLOT_CAPACITY) return "filling";
+            return "open";
+        },
+
+        serviceIcon(index) {
+            const icons = ["fa-solid fa-droplet", "fa-solid fa-spray-can-sparkles", "fa-solid fa-car-side", "fa-solid fa-gem", "fa-solid fa-star"];
+            return icons[index % icons.length];
+        },
+
+        formatPrice(price) {
+            return Number(price).toLocaleString("en-PH", { minimumFractionDigits: 2 });
+        },
+
         getConfig: function () {
             axios
                 .get("/appointment/api/config")
@@ -271,7 +474,6 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    // Fallback: load with defaults
                     this.getAppointments();
                 });
         },
@@ -296,6 +498,9 @@ export default {
                 .post("/size/api/get")
                 .then((response) => {
                     this.sizes = response.data;
+                    if (this.sizes.length && !this.sizes.find((s) => s.id === this.state.selectedSize)) {
+                        this.state.selectedSize = this.sizes[0].id;
+                    }
                 })
                 .catch((error) => {
                     console.error(error);
@@ -306,6 +511,9 @@ export default {
                 .post("/service/api/get")
                 .then((response) => {
                     this.services = response.data;
+                    if (this.services.length && !this.services.find((s) => s.id === this.state.selectedService)) {
+                        this.state.selectedService = this.services[0].id;
+                    }
                 })
                 .catch((error) => {
                     console.error(error);
@@ -337,6 +545,15 @@ export default {
         submit: function () {
             this.loading = true;
             this.error = null;
+
+            this.bookingConfirmation = {
+                service: this.selectedServiceName,
+                size: this.selectedSizeName,
+                date: this.formattedDate,
+                time: this.formatTime12(this.state.selectedSlot),
+                price: this.computedPrice,
+            };
+
             axios
                 .post("/appointment/api/put", {
                     date: this.state.selectedDate,
@@ -350,14 +567,13 @@ export default {
                 })
                 .then((response) => {
                     this.getAppointments();
-                    this.form.name = "";
-                    this.form.email = "";
-                    this.form.phone = "";
-                    this.form.notes = "";
+                    this.form = { name: "", email: "", phone: "", notes: "" };
+                    this.step = 1;
                     this.modal.show();
                 })
                 .catch((error) => {
                     this.error = error.response?.data?.message || "An error occurred while booking. Please try again.";
+                    this.bookingConfirmation = null;
                     this.loading = false;
                     this.modal.show();
                 });
@@ -373,6 +589,28 @@ export default {
             if (!service?.price) return "0.00";
             const multiplier = Number(size?.multiplier ?? 1);
             return (Number(service.price) * multiplier).toLocaleString("en-PH", { minimumFractionDigits: 2 });
+        },
+        morningSlots() {
+            return this.state.slots.filter((s) => parseInt(s.time.split(":")[0]) < 12);
+        },
+        afternoonSlots() {
+            return this.state.slots.filter((s) => parseInt(s.time.split(":")[0]) >= 12);
+        },
+        formattedDate() {
+            if (!this.state.selectedDate) return "—";
+            const d = new Date(this.state.selectedDate + "T00:00:00");
+            return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+        },
+        shortDate() {
+            if (!this.state.selectedDate) return "—";
+            const d = new Date(this.state.selectedDate + "T00:00:00");
+            return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        },
+        selectedServiceName() {
+            return this.services.find((s) => s.id === this.state.selectedService)?.name || "—";
+        },
+        selectedSizeName() {
+            return this.sizes.find((s) => s.id === this.state.selectedSize)?.name || "—";
         },
     },
     watch: {
