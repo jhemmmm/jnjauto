@@ -15,6 +15,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PanelApiController extends Controller
 {
@@ -360,21 +361,36 @@ class PanelApiController extends Controller
             'status' => 'required|in:scheduled,in_progress,completed,cancelled',
         ]);
 
-        $data = ['status' => $request->status];
+        $appointment = DB::transaction(function () use ($request, $appointment) {
+            $data = ['status' => $request->status];
 
-        if ($request->status === 'completed' && $appointment->status !== 'completed') {
-            $basePrice = $appointment->service?->price ?? 0;
-            $multiplier = $appointment->size?->multiplier ?? 1;
-            $data['amount'] = round($basePrice * $multiplier, 2);
-            $data['completed_at'] = now();
-        }
+            $transitioningToCompleted = $request->status === 'completed' && $appointment->status !== 'completed';
+            $transitioningFromCompleted = $request->status !== 'completed' && $appointment->status === 'completed';
 
-        if ($request->status !== 'completed' && $appointment->status === 'completed') {
-            $data['amount'] = null;
-            $data['completed_at'] = null;
-        }
+            if ($transitioningToCompleted) {
+                $basePrice = $appointment->service?->price ?? 0;
+                $multiplier = $appointment->size?->multiplier ?? 1;
+                $data['amount'] = round($basePrice * $multiplier, 2);
+                $data['completed_at'] = now();
+            }
 
-        $appointment->update($data);
+            if ($transitioningFromCompleted) {
+                $data['amount'] = null;
+                $data['completed_at'] = null;
+            }
+
+            $appointment->update($data);
+
+            if ($transitioningToCompleted) {
+                $this->applyServiceInventoryUsage($appointment);
+            }
+
+            if ($transitioningFromCompleted) {
+                $this->reverseServiceInventoryUsage($appointment);
+            }
+
+            return $appointment;
+        });
 
         // Send notification for status changes
         $statusLabels = [
@@ -410,12 +426,117 @@ class PanelApiController extends Controller
     }
 
     /**
+     * Deduct estimated inventory consumption for a service that was just completed.
+     */
+    protected function applyServiceInventoryUsage(Appointment $appointment): void
+    {
+        $service = $appointment->service()->with('inventoryItems')->first();
+        if (! $service) {
+            return;
+        }
+
+        $multiplier = (float) ($appointment->size?->multiplier ?? 1);
+        $serviceName = $service->name;
+
+        foreach ($service->inventoryItems as $item) {
+            $used = (int) round(((float) $item->pivot->quantity_per_service) * $multiplier);
+            if ($used <= 0) {
+                continue;
+            }
+
+            $before = $item->quantity;
+            $item->quantity = $before - $used;
+            $item->save();
+            $item->refreshStatus();
+
+            InventoryLog::create([
+                'item_id' => $item->id,
+                'user_id' => auth()->id(),
+                'type' => 'stock_out',
+                'quantity' => -$used,
+                'quantity_before' => $before,
+                'quantity_after' => $item->quantity,
+                'notes' => 'Service completed: '.$serviceName,
+                'reference_type' => 'appointment',
+                'reference_id' => $appointment->id,
+            ]);
+
+            $this->notifyIfLow($item);
+        }
+    }
+
+    /**
+     * Reverse a previously-applied service consumption when an appointment leaves "completed".
+     */
+    protected function reverseServiceInventoryUsage(Appointment $appointment): void
+    {
+        $logs = InventoryLog::with('item')
+            ->where('reference_type', 'appointment')
+            ->where('reference_id', $appointment->id)
+            ->where('type', 'stock_out')
+            ->get();
+
+        foreach ($logs as $log) {
+            $item = $log->item;
+            if (! $item) {
+                continue;
+            }
+
+            $restored = abs($log->quantity);
+            $before = $item->quantity;
+            $item->quantity = $before + $restored;
+            $item->save();
+            $item->refreshStatus();
+
+            InventoryLog::create([
+                'item_id' => $item->id,
+                'user_id' => auth()->id(),
+                'type' => 'stock_in',
+                'quantity' => $restored,
+                'quantity_before' => $before,
+                'quantity_after' => $item->quantity,
+                'notes' => 'Service completion reverted',
+                'reference_type' => 'appointment',
+                'reference_id' => $appointment->id,
+            ]);
+        }
+    }
+
+    /**
+     * Emit a low/out-of-stock notification if the item just crossed a threshold.
+     */
+    protected function notifyIfLow(InventoryItem $item): void
+    {
+        if ($item->status === 'low_stock') {
+            Notification::notifyAdmins(
+                'low_stock',
+                'Low Stock Alert',
+                $item->name.' is running low — only '.$item->quantity.' '.$item->unit.' remaining.',
+                'fa-solid fa-triangle-exclamation',
+                'warning',
+                '/panel/inventory',
+                ['item_id' => $item->id]
+            );
+        } elseif ($item->status === 'out_of_stock') {
+            Notification::notifyAdmins(
+                'out_of_stock',
+                'Out of Stock',
+                $item->name.' is now out of stock!',
+                'fa-solid fa-box-open',
+                'danger',
+                '/panel/inventory',
+                ['item_id' => $item->id]
+            );
+        }
+    }
+
+    /**
      * Services & sizes data
      */
     public function services()
     {
         return response()->json([
-            'services' => Service::orderBy('name')->get(),
+            'services' => Service::with('inventoryItems')->orderBy('name')->get(),
             'sizes' => Size::orderBy('name')->get(),
         ]);
     }
@@ -425,15 +546,22 @@ class PanelApiController extends Controller
      */
     public function storeService(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'inventory_items' => 'nullable|array',
+            'inventory_items.*.inventory_item_id' => 'required|exists:inventory_items,id',
+            'inventory_items.*.quantity_per_service' => 'required|numeric|min:0',
         ]);
 
         $service = Service::create($request->only('name', 'description', 'price'));
+        $this->syncServiceInventoryItems($service, $validated['inventory_items'] ?? []);
 
-        return response()->json(['message' => 'Service created successfully.', 'service' => $service]);
+        return response()->json([
+            'message' => 'Service created successfully.',
+            'service' => $service->load('inventoryItems'),
+        ]);
     }
 
     /**
@@ -441,15 +569,36 @@ class PanelApiController extends Controller
      */
     public function updateService(Request $request, Service $service)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'inventory_items' => 'nullable|array',
+            'inventory_items.*.inventory_item_id' => 'required|exists:inventory_items,id',
+            'inventory_items.*.quantity_per_service' => 'required|numeric|min:0',
         ]);
 
         $service->update($request->only('name', 'description', 'price'));
+        $this->syncServiceInventoryItems($service, $validated['inventory_items'] ?? []);
 
-        return response()->json(['message' => 'Service updated successfully.', 'service' => $service]);
+        return response()->json([
+            'message' => 'Service updated successfully.',
+            'service' => $service->load('inventoryItems'),
+        ]);
+    }
+
+    /**
+     * Sync a service's inventory-item pivot rows from a request payload.
+     */
+    protected function syncServiceInventoryItems(Service $service, array $items): void
+    {
+        $payload = [];
+        foreach ($items as $row) {
+            $payload[(int) $row['inventory_item_id']] = [
+                'quantity_per_service' => (float) $row['quantity_per_service'],
+            ];
+        }
+        $service->inventoryItems()->sync($payload);
     }
 
     /**
@@ -675,7 +824,9 @@ class PanelApiController extends Controller
             });
         }
 
-        $items = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = (int) $request->input('per_page', 15);
+        $perPage = max(1, min($perPage, 1000));
+        $items = $query->orderBy('name')->paginate($perPage)->withQueryString();
 
         $categories = InventoryCategory::withCount('items')->orderBy('name')->get();
 

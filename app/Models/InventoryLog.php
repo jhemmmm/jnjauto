@@ -42,6 +42,8 @@ class InventoryLog extends Model
         'quantity_before',
         'quantity_after',
         'notes',
+        'reference_type',
+        'reference_id',
     ];
 
     public function item()

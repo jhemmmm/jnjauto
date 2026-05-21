@@ -194,6 +194,28 @@
                                 </label>
                                 <input v-model="serviceForm.price" type="number" class="form-control rounded-4" placeholder="e.g. 350.00" step="0.01" min="0" />
                             </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold mb-1">Inventory used per service</label>
+                                <div class="form-text small mb-2">Estimated consumption per completed service. Will be multiplied by the appointment size.</div>
+                                <div v-if="serviceForm.inventory_items.length > 0" class="d-flex flex-column gap-2 mb-2">
+                                    <div v-for="(row, idx) in serviceForm.inventory_items" :key="idx" class="d-flex gap-2 align-items-center">
+                                        <select v-model="row.inventory_item_id" class="form-select form-select-sm rounded-4 flex-grow-1">
+                                            <option :value="null" disabled>Select item...</option>
+                                            <option v-for="item in inventoryItems" :key="item.id" :value="item.id">
+                                                {{ item.name }} ({{ item.unit }})
+                                            </option>
+                                        </select>
+                                        <input v-model="row.quantity_per_service" type="number" class="form-control form-control-sm rounded-4" style="max-width: 110px" placeholder="Qty" step="0.001" min="0" />
+                                        <button type="button" class="btn btn-sm btn-light border rounded-4" @click="removeInventoryRow(idx)" title="Remove">
+                                            <i class="fa-solid fa-xmark text-danger"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-light border rounded-4 fw-semibold" @click="addInventoryRow">
+                                    <i class="fa-solid fa-plus me-1"></i>
+                                    Add item
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-0 px-4 pb-4 pt-0">
@@ -299,7 +321,8 @@ export default {
             saving: false,
             services: [],
             sizes: [],
-            serviceForm: { id: null, name: "", description: "", price: "" },
+            inventoryItems: [],
+            serviceForm: { id: null, name: "", description: "", price: "", inventory_items: [] },
             sizeForm: { id: null, name: "", description: "", multiplier: 1.0 },
             deleteTarget: null,
             deleting: false,
@@ -337,9 +360,14 @@ export default {
         async fetchData() {
             this.loading = true;
             try {
-                const { data } = await axios.get("/panel/api/services");
-                this.services = data.services;
-                this.sizes = data.sizes;
+                const [servicesRes, inventoryRes] = await Promise.all([
+                    axios.get("/panel/api/services"),
+                    axios.get("/panel/api/inventory", { params: { per_page: 1000 } }),
+                ]);
+                this.services = servicesRes.data.services;
+                this.sizes = servicesRes.data.sizes;
+                const items = inventoryRes.data.items;
+                this.inventoryItems = Array.isArray(items) ? items : items?.data || [];
             } catch (e) {
                 console.error(e);
             } finally {
@@ -347,12 +375,27 @@ export default {
             }
         },
         openAddService() {
-            this.serviceForm = { id: null, name: "", description: "", price: "" };
+            this.serviceForm = { id: null, name: "", description: "", price: "", inventory_items: [] };
             this.serviceModalInstance.show();
         },
         editService(s) {
-            this.serviceForm = { id: s.id, name: s.name, description: s.description || "", price: s.price || "" };
+            this.serviceForm = {
+                id: s.id,
+                name: s.name,
+                description: s.description || "",
+                price: s.price || "",
+                inventory_items: (s.inventoryItems || s.inventory_items || []).map((it) => ({
+                    inventory_item_id: it.id,
+                    quantity_per_service: it.pivot?.quantity_per_service ?? 0,
+                })),
+            };
             this.serviceModalInstance.show();
+        },
+        addInventoryRow() {
+            this.serviceForm.inventory_items.push({ inventory_item_id: null, quantity_per_service: 0 });
+        },
+        removeInventoryRow(idx) {
+            this.serviceForm.inventory_items.splice(idx, 1);
         },
         async saveService() {
             this.saving = true;

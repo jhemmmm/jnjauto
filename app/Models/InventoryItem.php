@@ -65,6 +65,13 @@ class InventoryItem extends Model
         return $this->hasMany(InventoryLog::class, 'item_id');
     }
 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'service_inventory_items')
+            ->withPivot('quantity_per_service')
+            ->withTimestamps();
+    }
+
     /**
      * Recalculate status based on current quantity vs reorder level.
      */

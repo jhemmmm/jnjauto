@@ -36,4 +36,11 @@ class Service extends Model
     {
         return $this->hasMany(Appointment::class);
     }
+
+    public function inventoryItems()
+    {
+        return $this->belongsToMany(InventoryItem::class, 'service_inventory_items')
+            ->withPivot('quantity_per_service')
+            ->withTimestamps();
+    }
 }
