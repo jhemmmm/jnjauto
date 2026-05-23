@@ -118,11 +118,11 @@
                                 </td>
                                 <td>
                                     <span class="badge text-bg-light border rounded-pill px-2 py-1">
-                                        {{ item.category?.name || "—" }}
+                                        {{ item.category?.name || "-" }}
                                     </span>
                                 </td>
                                 <td>
-                                    <code class="small">{{ item.sku || "—" }}</code>
+                                    <code class="small">{{ item.sku || "-" }}</code>
                                 </td>
                                 <td class="text-center">
                                     <span class="fw-bold" :class="stockColor(item)">{{ item.quantity }} {{ item.unit }}</span>
@@ -165,7 +165,7 @@
                                 <div>
                                     <div class="fw-bold">{{ item.name }}</div>
                                     <span class="badge text-bg-light border rounded-pill px-2 py-1 small">
-                                        {{ item.category?.name || "—" }}
+                                        {{ item.category?.name || "-" }}
                                     </span>
                                 </div>
                                 <span class="badge rounded-pill px-2 py-1" :class="statusBadge(item.status)">
@@ -184,7 +184,7 @@
                                 <div class="col-4">
                                     <div class="text-secondary">SKU</div>
                                     <div class="fw-bold">
-                                        <code>{{ item.sku || "—" }}</code>
+                                        <code>{{ item.sku || "-" }}</code>
                                     </div>
                                 </div>
                             </div>
@@ -262,7 +262,7 @@
                                 <div class="fw-bold">{{ c.name }}</div>
                             </td>
                             <td>
-                                <div class="small text-secondary">{{ c.description || "—" }}</div>
+                                <div class="small text-secondary">{{ c.description || "-" }}</div>
                             </td>
                             <td class="text-center">
                                 <span class="badge text-bg-light border rounded-pill px-2 py-1">{{ c.items_count }}</span>
@@ -506,7 +506,7 @@
                                     <tbody>
                                         <tr v-for="log in logs.data" :key="log.id">
                                             <td class="text-nowrap">{{ formatDate(log.created_at) }}</td>
-                                            <td class="fw-bold">{{ log.item?.name || "—" }}</td>
+                                            <td class="fw-bold">{{ log.item?.name || "-" }}</td>
                                             <td>
                                                 <span class="badge rounded-pill px-2 py-1" :class="logBadge(log.type)">
                                                     {{ logLabel(log.type) }}
@@ -515,7 +515,7 @@
                                             <td class="text-center fw-bold" :class="log.quantity > 0 ? 'text-success' : 'text-danger'">{{ log.quantity > 0 ? "+" : "" }}{{ log.quantity }}</td>
                                             <td class="text-center">{{ log.quantity_before }} → {{ log.quantity_after }}</td>
                                             <td>{{ log.user?.name || "System" }}</td>
-                                            <td class="small text-secondary">{{ log.notes || "—" }}</td>
+                                            <td class="small text-secondary">{{ log.notes || "-" }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -901,7 +901,7 @@ export default {
         },
 
         formatDate(dt) {
-            if (!dt) return "—";
+            if (!dt) return "-";
             const d = new Date(dt);
             return d.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) + " " + d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
         },

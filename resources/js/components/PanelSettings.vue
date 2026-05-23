@@ -210,11 +210,11 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Currency</label>
                                         <select class="form-select rounded-4" v-model="business.currency" required>
-                                            <option value="PHP">PHP — Philippine Peso</option>
-                                            <option value="USD">USD — US Dollar</option>
-                                            <option value="EUR">EUR — Euro</option>
-                                            <option value="GBP">GBP — British Pound</option>
-                                            <option value="JPY">JPY — Japanese Yen</option>
+                                            <option value="PHP">PHP - Philippine Peso</option>
+                                            <option value="USD">USD - US Dollar</option>
+                                            <option value="EUR">EUR - Euro</option>
+                                            <option value="GBP">GBP - British Pound</option>
+                                            <option value="JPY">JPY - Japanese Yen</option>
                                         </select>
                                     </div>
                                     <div class="col-12">

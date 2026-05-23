@@ -104,7 +104,7 @@
                         </span>
                     </h5>
                     <p class="text-secondary">
-                        {{ $settings['business_name'] ?? 'JNJ Auto Car Wash' }} —
+                        {{ $settings['business_name'] ?? 'JNJ Auto Car Wash' }} -
                         Professional car wash and detailing services. Fast, reliable, and affordable.
                     </p>
                 </div>

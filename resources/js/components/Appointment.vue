@@ -287,7 +287,7 @@
                                     </div>
                                     <div class="summary-line mt-2">
                                         <span>Time</span>
-                                        <span class="fw-bold">{{ state.selectedSlot ? formatTime12(state.selectedSlot) : "—" }}</span>
+                                        <span class="fw-bold">{{ state.selectedSlot ? formatTime12(state.selectedSlot) : "-" }}</span>
                                     </div>
                                     <hr class="my-2" />
                                     <div class="summary-line">
@@ -608,20 +608,20 @@ export default {
             return this.state.slots.filter((s) => parseInt(s.time.split(":")[0]) >= 12);
         },
         formattedDate() {
-            if (!this.state.selectedDate) return "—";
+            if (!this.state.selectedDate) return "-";
             const d = new Date(this.state.selectedDate + "T00:00:00");
             return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
         },
         shortDate() {
-            if (!this.state.selectedDate) return "—";
+            if (!this.state.selectedDate) return "-";
             const d = new Date(this.state.selectedDate + "T00:00:00");
             return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         },
         selectedServiceName() {
-            return this.services.find((s) => s.id === this.state.selectedService)?.name || "—";
+            return this.services.find((s) => s.id === this.state.selectedService)?.name || "-";
         },
         selectedSizeName() {
-            return this.sizes.find((s) => s.id === this.state.selectedSize)?.name || "—";
+            return this.sizes.find((s) => s.id === this.state.selectedSize)?.name || "-";
         },
     },
     watch: {

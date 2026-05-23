@@ -152,7 +152,7 @@
                             </div>
                             <div class="flex-grow-1 min-w-0">
                                 <div class="fw-semibold text-truncate">{{ cust.customer_name }}</div>
-                                <div class="small text-secondary text-truncate">{{ cust.customer_email || cust.customer_phone || "—" }}</div>
+                                <div class="small text-secondary text-truncate">{{ cust.customer_email || cust.customer_phone || "-" }}</div>
                             </div>
                             <div class="text-end">
                                 <div class="fw-bold text-info-emphasis">₱{{ formatCurrency(cust.total_spent) }}</div>
@@ -202,22 +202,22 @@
                                     </td>
                                     <td>
                                         <div class="fw-bold">{{ sale.customer_name }}</div>
-                                        <div class="small text-secondary">{{ sale.customer_phone || sale.customer_email || "—" }}</div>
+                                        <div class="small text-secondary">{{ sale.customer_phone || sale.customer_email || "-" }}</div>
                                     </td>
                                     <td>
                                         <span class="badge text-bg-info bg-opacity-10 text-info-emphasis rounded-pill px-3 py-2">
-                                            {{ sale.service?.name ?? "—" }}
+                                            {{ sale.service?.name ?? "-" }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="small">{{ sale.size?.name ?? "—" }}</span>
+                                        <span class="small">{{ sale.size?.name ?? "-" }}</span>
                                     </td>
                                     <td>
                                         <div class="fw-semibold">{{ formatDate(sale.date) }}</div>
                                         <div class="small text-secondary">{{ sale.time }}</div>
                                     </td>
                                     <td>
-                                        <div class="small">{{ sale.completed_at ? formatDateTime(sale.completed_at) : "—" }}</div>
+                                        <div class="small">{{ sale.completed_at ? formatDateTime(sale.completed_at) : "-" }}</div>
                                     </td>
                                     <td class="text-end">
                                         <span class="fw-bold text-success fs-6">₱{{ formatCurrency(sale.amount || 0) }}</span>
@@ -313,7 +313,7 @@ export default {
             if (!this.data.sales || this.data.sales.length === 0) return;
 
             const headers = ["#", "Customer", "Email", "Phone", "Service", "Size", "Date", "Time", "Completed", "Amount"];
-            const rows = this.data.sales.map((s) => [s.id, '"' + (s.customer_name || "").replace(/"/g, '""') + '"', '"' + (s.customer_email || "").replace(/"/g, '""') + '"', '"' + (s.customer_phone || "").replace(/"/g, '""') + '"', '"' + (s.service?.name || "—").replace(/"/g, '""') + '"', '"' + (s.size?.name || "—").replace(/"/g, '""') + '"', s.date ? String(s.date).substring(0, 10) : "", s.time || "", s.completed_at || "", s.amount || 0]);
+            const rows = this.data.sales.map((s) => [s.id, '"' + (s.customer_name || "").replace(/"/g, '""') + '"', '"' + (s.customer_email || "").replace(/"/g, '""') + '"', '"' + (s.customer_phone || "").replace(/"/g, '""') + '"', '"' + (s.service?.name || "-").replace(/"/g, '""') + '"', '"' + (s.size?.name || "-").replace(/"/g, '""') + '"', s.date ? String(s.date).substring(0, 10) : "", s.time || "", s.completed_at || "", s.amount || 0]);
 
             const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -410,12 +410,12 @@ export default {
             return Number(val || 0).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         },
         formatDate(d) {
-            if (!d) return "—";
+            if (!d) return "-";
             const str = String(d).substring(0, 10);
             return new Date(str + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
         },
         formatDateTime(dt) {
-            if (!dt) return "—";
+            if (!dt) return "-";
             return new Date(dt).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true });
         },
         capitalize(s) {

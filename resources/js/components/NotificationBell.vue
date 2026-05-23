@@ -91,7 +91,7 @@ export default {
                 this.unreadCount = data.count;
                 this.recentNotifications = data.recent;
             } catch (e) {
-                // Silently fail — user may not be authenticated
+                // Silently fail - user may not be authenticated
             }
         },
 

@@ -41,7 +41,7 @@ class NotificationSeeder extends Seeder
             [
                 'type'       => 'low_stock',
                 'title'      => 'Low Stock Alert',
-                'message'    => 'Car Shampoo is running low — only 3 bottles remaining.',
+                'message'    => 'Car Shampoo is running low - only 3 bottles remaining.',
                 'icon'       => 'fa-solid fa-triangle-exclamation',
                 'icon_color' => 'warning',
                 'link'       => '/panel/inventory',
@@ -89,7 +89,7 @@ class NotificationSeeder extends Seeder
             [
                 'type'       => 'low_stock',
                 'title'      => 'Low Stock Alert',
-                'message'    => 'Wheel Cleaner Spray is running low — only 5 units remaining.',
+                'message'    => 'Wheel Cleaner Spray is running low - only 5 units remaining.',
                 'icon'       => 'fa-solid fa-triangle-exclamation',
                 'icon_color' => 'warning',
                 'link'       => '/panel/inventory',

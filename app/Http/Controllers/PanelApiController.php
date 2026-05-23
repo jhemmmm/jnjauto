@@ -102,8 +102,8 @@ class PanelApiController extends Controller
                 'id' => $a->id,
                 'customer_name' => $a->customer_name,
                 'customer_phone' => $a->customer_phone,
-                'service' => $a->service->name ?? '—',
-                'size' => $a->size->name ?? '—',
+                'service' => $a->service->name ?? '-',
+                'size' => $a->size->name ?? '-',
                 'time' => Carbon::createFromFormat('H:i', $a->time)->format('h:i A'),
                 'status' => $a->status,
             ]);
@@ -189,7 +189,7 @@ class PanelApiController extends Controller
             ->map(fn ($i) => [
                 'id' => $i->id,
                 'name' => $i->name,
-                'category' => $i->category->name ?? '—',
+                'category' => $i->category->name ?? '-',
                 'quantity' => $i->quantity,
                 'unit' => $i->unit,
                 'reorder_level' => $i->reorder_level,
@@ -525,7 +525,7 @@ class PanelApiController extends Controller
             Notification::notifyAdmins(
                 'low_stock',
                 'Low Stock Alert',
-                $item->name.' is running low — only '.$item->quantity.' '.$item->unit.' remaining.',
+                $item->name.' is running low - only '.$item->quantity.' '.$item->unit.' remaining.',
                 'fa-solid fa-triangle-exclamation',
                 'warning',
                 '/panel/inventory',
@@ -624,7 +624,7 @@ class PanelApiController extends Controller
         $count = Appointment::where('service_id', $service->id)->count();
         if ($count > 0) {
             return response()->json([
-                'message' => "Cannot delete this service — it is linked to {$count} appointment(s). Remove or reassign those appointments first.",
+                'message' => "Cannot delete this service - it is linked to {$count} appointment(s). Remove or reassign those appointments first.",
             ], 422);
         }
 
@@ -674,7 +674,7 @@ class PanelApiController extends Controller
         $count = Appointment::where('size_id', $size->id)->count();
         if ($count > 0) {
             return response()->json([
-                'message' => "Cannot delete this size — it is linked to {$count} appointment(s). Remove or reassign those appointments first.",
+                'message' => "Cannot delete this size - it is linked to {$count} appointment(s). Remove or reassign those appointments first.",
             ], 422);
         }
 
@@ -815,7 +815,7 @@ class PanelApiController extends Controller
     // ───────────────────────────────────────────────
 
     /**
-     * Inventory page data — items, categories, stats
+     * Inventory page data - items, categories, stats
      */
     public function inventory(Request $request)
     {
@@ -942,7 +942,7 @@ class PanelApiController extends Controller
     }
 
     /**
-     * Update an inventory item (details only — stock changes via adjustStock)
+     * Update an inventory item (details only - stock changes via adjustStock)
      */
     public function updateInventoryItem(Request $request, InventoryItem $inventoryItem)
     {
@@ -997,7 +997,7 @@ class PanelApiController extends Controller
             }
             $inventoryItem->quantity -= $request->quantity;
         } else {
-            // adjustment — set to exact value
+            // adjustment - set to exact value
             $inventoryItem->quantity = $request->quantity;
         }
 
@@ -1019,7 +1019,7 @@ class PanelApiController extends Controller
             Notification::notifyAdmins(
                 'low_stock',
                 'Low Stock Alert',
-                $inventoryItem->name.' is running low — only '.$inventoryItem->quantity.' '.$inventoryItem->unit.' remaining.',
+                $inventoryItem->name.' is running low - only '.$inventoryItem->quantity.' '.$inventoryItem->unit.' remaining.',
                 'fa-solid fa-triangle-exclamation',
                 'warning',
                 '/panel/inventory',
@@ -1225,7 +1225,7 @@ class PanelApiController extends Controller
     }
 
     /**
-     * Update business settings (admin only — route-level middleware enforces this)
+     * Update business settings (admin only - route-level middleware enforces this)
      */
     public function updateBusinessSettings(Request $request)
     {
@@ -1451,8 +1451,8 @@ class PanelApiController extends Controller
                 '"'.str_replace('"', '""', $sale->customer_name ?? '').'"',
                 '"'.str_replace('"', '""', $sale->customer_email ?? '').'"',
                 '"'.str_replace('"', '""', $sale->customer_phone ?? '').'"',
-                '"'.str_replace('"', '""', $sale->service->name ?? '—').'"',
-                '"'.str_replace('"', '""', $sale->size->name ?? '—').'"',
+                '"'.str_replace('"', '""', $sale->service->name ?? '-').'"',
+                '"'.str_replace('"', '""', $sale->size->name ?? '-').'"',
                 $sale->time ?? '',
                 $sale->completed_at ? Carbon::parse($sale->completed_at)->format('h:i A') : '',
                 $sale->amount ?? 0,
@@ -1478,7 +1478,7 @@ class PanelApiController extends Controller
             };
             $lines[] = implode(',', [
                 '"'.str_replace('"', '""', $item->name).'"',
-                '"'.str_replace('"', '""', $item->category->name ?? '—').'"',
+                '"'.str_replace('"', '""', $item->category->name ?? '-').'"',
                 '"'.str_replace('"', '""', $item->sku ?? '').'"',
                 $item->quantity,
                 '"'.($item->unit ?? 'pcs').'"',

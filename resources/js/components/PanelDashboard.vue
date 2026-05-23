@@ -298,7 +298,7 @@
                                     <i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>
                                     Inventory Alerts
                                 </h3>
-                                <p class="small text-secondary mb-0">Items that need attention — low stock or out of stock.</p>
+                                <p class="small text-secondary mb-0">Items that need attention - low stock or out of stock.</p>
                             </div>
                             <a href="/panel/inventory" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold align-self-start align-self-md-center">
                                 Manage Inventory

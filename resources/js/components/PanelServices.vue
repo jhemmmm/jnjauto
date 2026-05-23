@@ -27,7 +27,7 @@
                     <div class="small text-secondary fw-semibold mb-2">Price Range</div>
                     <div class="h2 fw-bold mb-1">
                         <template v-if="services.length > 0">₱{{ minPrice }} – ₱{{ maxPrice }}</template>
-                        <template v-else>—</template>
+                        <template v-else>-</template>
                     </div>
                     <div class="small text-success fw-bold">
                         <i class="fa-solid fa-peso-sign me-1"></i>
@@ -68,11 +68,11 @@
                                     <div class="fw-bold">{{ s.name }}</div>
                                 </td>
                                 <td>
-                                    <div class="small text-secondary">{{ s.description || "—" }}</div>
+                                    <div class="small text-secondary">{{ s.description || "-" }}</div>
                                 </td>
                                 <td>
                                     <span class="fw-bold text-info-emphasis">
-                                        {{ s.price ? "₱" + Number(s.price).toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "—" }}
+                                        {{ s.price ? "₱" + Number(s.price).toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" }}
                                     </span>
                                 </td>
                                 <td>
@@ -132,7 +132,7 @@
                                     <div class="fw-bold">{{ sz.name }}</div>
                                 </td>
                                 <td>
-                                    <div class="small text-secondary">{{ sz.description || "—" }}</div>
+                                    <div class="small text-secondary">{{ sz.description || "-" }}</div>
                                 </td>
                                 <td>
                                     <span class="badge text-bg-light border rounded-pill px-3 py-2 fw-bold">{{ Number(sz.multiplier).toFixed(2) }}×</span>
@@ -201,9 +201,7 @@
                                     <div v-for="(row, idx) in serviceForm.inventory_items" :key="idx" class="d-flex gap-2 align-items-center">
                                         <select v-model="row.inventory_item_id" class="form-select form-select-sm rounded-4 flex-grow-1">
                                             <option :value="null" disabled>Select item...</option>
-                                            <option v-for="item in inventoryItems" :key="item.id" :value="item.id">
-                                                {{ item.name }} ({{ item.unit }})
-                                            </option>
+                                            <option v-for="item in inventoryItems" :key="item.id" :value="item.id">{{ item.name }} ({{ item.unit }})</option>
                                         </select>
                                         <input v-model="row.quantity_per_service" type="number" class="form-control form-control-sm rounded-4" style="max-width: 110px" placeholder="Qty" step="0.001" min="0" />
                                         <button type="button" class="btn btn-sm btn-light border rounded-4" @click="removeInventoryRow(idx)" title="Remove">
@@ -360,10 +358,7 @@ export default {
         async fetchData() {
             this.loading = true;
             try {
-                const [servicesRes, inventoryRes] = await Promise.all([
-                    axios.get("/panel/api/services"),
-                    axios.get("/panel/api/inventory", { params: { per_page: 1000 } }),
-                ]);
+                const [servicesRes, inventoryRes] = await Promise.all([axios.get("/panel/api/services"), axios.get("/panel/api/inventory", { params: { per_page: 1000 } })]);
                 this.services = servicesRes.data.services;
                 this.sizes = servicesRes.data.sizes;
                 const items = inventoryRes.data.items;

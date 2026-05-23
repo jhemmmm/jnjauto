@@ -119,8 +119,8 @@
                                         <div class="small text-secondary" v-if="a.customer_email">{{ a.customer_email }}</div>
                                         <div class="small text-secondary" v-if="a.customer_phone">{{ a.customer_phone }}</div>
                                     </td>
-                                    <td>{{ a.service?.name ?? "—" }}</td>
-                                    <td>{{ a.size?.name ?? "—" }}</td>
+                                    <td>{{ a.service?.name ?? "-" }}</td>
+                                    <td>{{ a.size?.name ?? "-" }}</td>
                                     <td>
                                         <span class="fw-bold text-info-emphasis">₱{{ computePrice(a) }}</span>
                                     </td>
@@ -222,10 +222,10 @@
                                     {{ statusLabel(a.status) }}
                                 </span>
                                 <span class="badge text-bg-light border rounded-pill px-2 py-1 small">
-                                    {{ a.service?.name ?? "—" }}
+                                    {{ a.service?.name ?? "-" }}
                                 </span>
                                 <span class="badge text-bg-light border rounded-pill px-2 py-1 small">
-                                    {{ a.size?.name ?? "—" }}
+                                    {{ a.size?.name ?? "-" }}
                                 </span>
                                 <span class="badge text-bg-light border rounded-pill px-2 py-1 small fw-bold text-info-emphasis">₱{{ computePrice(a) }}</span>
                             </div>
@@ -304,7 +304,7 @@
                                     <option value="">Select a service</option>
                                     <option v-for="s in servicesList" :key="s.id" :value="s.id">
                                         {{ s.name }}
-                                        <span v-if="s.price">— ₱{{ Number(s.price).toLocaleString("en-PH", { minimumFractionDigits: 2 }) }}</span>
+                                        <span v-if="s.price">- ₱{{ Number(s.price).toLocaleString("en-PH", { minimumFractionDigits: 2 }) }}</span>
                                     </option>
                                 </select>
                             </div>
@@ -378,19 +378,19 @@
                             </div>
                             <div class="d-flex justify-content-between border-bottom pb-3">
                                 <span class="text-secondary fw-semibold small">Email</span>
-                                <span>{{ viewing.customer_email || "—" }}</span>
+                                <span>{{ viewing.customer_email || "-" }}</span>
                             </div>
                             <div class="d-flex justify-content-between border-bottom pb-3">
                                 <span class="text-secondary fw-semibold small">Phone</span>
-                                <span>{{ viewing.customer_phone || "—" }}</span>
+                                <span>{{ viewing.customer_phone || "-" }}</span>
                             </div>
                             <div class="d-flex justify-content-between border-bottom pb-3">
                                 <span class="text-secondary fw-semibold small">Service</span>
-                                <span class="fw-bold">{{ viewing.service?.name ?? "—" }}</span>
+                                <span class="fw-bold">{{ viewing.service?.name ?? "-" }}</span>
                             </div>
                             <div class="d-flex justify-content-between border-bottom pb-3">
                                 <span class="text-secondary fw-semibold small">Vehicle Size</span>
-                                <span>{{ viewing.size?.name ?? "—" }}</span>
+                                <span>{{ viewing.size?.name ?? "-" }}</span>
                             </div>
                             <div class="d-flex justify-content-between border-bottom pb-3">
                                 <span class="text-secondary fw-semibold small">Price</span>
@@ -432,7 +432,7 @@
                         <p class="text-secondary mb-0">
                             Are you sure you want to delete
                             <strong>#{{ deleteTarget?.id }}</strong>
-                            — {{ deleteTarget?.customer_name }}? This cannot be undone.
+                            - {{ deleteTarget?.customer_name }}? This cannot be undone.
                         </p>
                     </div>
                     <div class="modal-footer border-0 px-4 pb-4 pt-0 justify-content-center gap-2">
@@ -638,13 +638,13 @@ export default {
             toast.show();
         },
         formatDate(d) {
-            if (!d) return "—";
+            if (!d) return "-";
             const str = String(d).substring(0, 10);
             const date = new Date(str + "T00:00:00");
             return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
         },
         formatTime(t) {
-            if (!t) return "—";
+            if (!t) return "-";
             const [h, m] = t.split(":");
             const hr = parseInt(h);
             return `${hr > 12 ? hr - 12 : hr || 12}:${m} ${hr >= 12 ? "PM" : "AM"}`;

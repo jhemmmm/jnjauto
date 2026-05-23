@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AdminMiddleware
 {
     /**
-     * Handle an incoming request — only allow admins.
+     * Handle an incoming request - only allow admins.
      */
     public function handle(Request $request, Closure $next): Response
     {

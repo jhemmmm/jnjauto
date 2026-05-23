@@ -43,7 +43,7 @@ Route::group(['prefix' => 'service', 'as' => 'service.'], function () {
 Auth::routes(['register' => false]);
 
 Route::group(['prefix' => 'panel', 'as' => 'panel.'], function () {
-    // Page routes (just return views — Vue components handle all data)
+    // Page routes (just return views - Vue components handle all data)
     Route::get('/', [App\Http\Controllers\PanelController::class, 'dashboard'])->name('dashboard');
     Route::get('/appointments', [App\Http\Controllers\PanelController::class, 'appointments'])->name('appointments');
     Route::get('/services', [App\Http\Controllers\PanelController::class, 'services'])->name('services');
