@@ -35,9 +35,18 @@ class AppointmentConfirmation extends Mailable
                 'appointment' => $this->appointment,
                 'businessName' => Setting::get('business_name', 'JNJ Auto Car Wash'),
                 'businessPhone' => Setting::get('business_phone', '(+63) 919-123-4567'),
+                'businessEmail' => Setting::get('business_email', 'info@jnjauto.com'),
                 'businessAddress' => Setting::get('business_address', ''),
+                'businessLogoUrl' => $this->businessLogoUrl(),
                 'currency' => Setting::get('currency', 'PHP'),
             ],
         );
+    }
+
+    private function businessLogoUrl(): string
+    {
+        $logo = Setting::get('business_logo');
+
+        return $logo ? asset('storage/'.$logo) : asset('images/logo.png');
     }
 }

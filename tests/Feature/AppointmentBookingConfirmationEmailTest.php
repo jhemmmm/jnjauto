@@ -6,6 +6,7 @@ use App\Mail\AppointmentConfirmation;
 use App\Mail\AppointmentStatusUpdated;
 use App\Models\Appointment;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\Size;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -92,5 +93,37 @@ class AppointmentBookingConfirmationEmailTest extends TestCase
             return $mail->hasTo('juan@example.com')
                 && $mail->appointment->is($appointment);
         });
+    }
+
+    public function test_customer_email_templates_include_the_business_logo(): void
+    {
+        Setting::set('business_logo', 'logos/jnj-logo.png');
+
+        $service = Service::create([
+            'name' => 'Full Wash',
+            'description' => 'Exterior and interior cleaning package.',
+            'price' => 299,
+        ]);
+        $size = Size::create([
+            'name' => 'Small',
+            'description' => 'Sedan / Hatchback',
+            'multiplier' => 1,
+        ]);
+        $appointment = Appointment::create([
+            'date' => '2026-05-25',
+            'time' => '09:00:00',
+            'service_id' => $service->id,
+            'size_id' => $size->id,
+            'customer_name' => 'Juan Dela Cruz',
+            'customer_email' => 'juan@example.com',
+            'customer_phone' => '09171234567',
+            'notes' => 'NAA 4821',
+            'status' => 'scheduled',
+        ]);
+
+        $logoUrl = asset('storage/logos/jnj-logo.png');
+
+        $this->assertStringContainsString($logoUrl, (new AppointmentConfirmation($appointment))->render());
+        $this->assertStringContainsString($logoUrl, (new AppointmentStatusUpdated($appointment))->render());
     }
 }
