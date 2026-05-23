@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Appointment;
@@ -12,6 +13,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +24,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::transaction(function () {
+            $this->seedRolesAndUsers();
+
+            $services = $this->seedServices();
+            $sizes = $this->seedSizes();
+            $items = $this->seedInventory();
+
+            $this->syncServiceInventory($services, $items);
+            $created = $this->seedMonthlyAppointments($services, $sizes);
+
+            $this->command->info(
+                "Month seeded: {$created['appointments']} appointments, {$created['completed']} completed sales, inventory stocked with empty SKUs."
+            );
+        });
+    }
+
+    private function seedRolesAndUsers(): void
+    {
         $roles = [
             ['name' => 'Customer', 'description' => 'Regular customer with no special permissions.'],
             ['name' => 'Admin', 'description' => 'Administrator with full permissions.'],
@@ -29,96 +49,204 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Role::create($role);
+            Role::updateOrCreate(['name' => $role['name']], $role);
         }
 
-        User::firstOrCreate(
+        $adminRole = Role::where('name', 'Admin')->first();
+        $staffRole = Role::where('name', 'Staff')->first();
+
+        User::updateOrCreate(
             ['email' => 'admin@jnj.com'],
-            ['name' => 'Admin', 'password' => bcrypt('password'), 'role_id' => 2]
+            ['name' => 'Admin', 'password' => bcrypt('password'), 'role_id' => $adminRole?->id]
         );
 
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'staff@jnj.com'],
-            ['name' => 'Mj Basiño', 'password' => bcrypt('password'), 'role_id' => 3]
+            ['name' => 'Jonel Alimuin', 'password' => bcrypt('password'), 'role_id' => $staffRole?->id]
         );
+    }
+
+    private function seedServices()
+    {
         $services = [
-            ['name' => 'Basic Wash', 'description' => 'Exterior hand wash and towel dry.', 'price' => 149.00],
-            ['name' => 'Full Wash', 'description' => 'Exterior and interior cleaning package.', 'price' => 299.00],
-            ['name' => 'Premium Detail', 'description' => 'Full detail with wax and interior shampoo.', 'price' => 599.00],
-            ['name' => 'Engine Wash', 'description' => 'Engine bay cleaning and degreasing.', 'price' => 399.00],
+            'Basic Wash' => [
+                'description' => 'Exterior hand wash, rinse, and towel dry.',
+                'price' => 149.00,
+            ],
+            'Full Wash' => [
+                'description' => 'Exterior wash, interior vacuum, tire black, and glass cleaning.',
+                'price' => 299.00,
+            ],
+            'Premium Detail' => [
+                'description' => 'Full detail with wax, interior cleaning, tire black, and finishing spray.',
+                'price' => 599.00,
+            ],
+            'Engine Wash' => [
+                'description' => 'Engine bay cleaning with degreaser and controlled rinse.',
+                'price' => 399.00,
+            ],
         ];
 
-        foreach ($services as $s) {
-            Service::firstOrCreate(['name' => $s['name']], $s);
+        foreach ($services as $name => $data) {
+            Service::updateOrCreate(['name' => $name], array_merge(['name' => $name], $data));
         }
-        $serviceIds = Service::pluck('id', 'name');
 
+        return Service::whereIn('name', array_keys($services))->get()->keyBy('name');
+    }
+
+    private function seedSizes()
+    {
         $sizes = [
-            ['name' => 'Small', 'description' => 'Sedan / Hatchback', 'multiplier' => 1.00],
-            ['name' => 'Medium', 'description' => 'SUV / Crossover', 'multiplier' => 1.50],
-            ['name' => 'Large', 'description' => 'Truck / Van / Full-size SUV', 'multiplier' => 2.00],
+            'Small' => ['description' => 'Sedan / Hatchback', 'multiplier' => 1.00],
+            'Medium' => ['description' => 'SUV / Crossover / MPV', 'multiplier' => 1.50],
+            'Large' => ['description' => 'Pickup / Van / Full-size SUV', 'multiplier' => 2.00],
         ];
 
-        foreach ($sizes as $sz) {
-            Size::firstOrCreate(['name' => $sz['name']], $sz);
+        foreach ($sizes as $name => $data) {
+            Size::updateOrCreate(['name' => $name], array_merge(['name' => $name], $data));
         }
-        $sizeIds = Size::pluck('id', 'name');
 
-        $customers = [
-            ['name' => 'Jheamuel Panuelos', 'email' => 'sample@email.com', 'phone' => '0917-111-2222'],
-            ['name' => 'John Joseph Salvado', 'email' => 'sample@email.com', 'phone' => '0918-222-3333'],
-            ['name' => 'MJ Basiño', 'email' => 'sample@email.com', 'phone' => '0919-333-4444'],
-            ['name' => 'Mary Ann Lumbria', 'email' => 'sample@email.com', 'phone' => '0920-444-5555'],
-            ['name' => 'Polpol Polinag', 'email' => 'sample@email.com', 'phone' => '0921-555-6666'],
-            ['name' => 'Kel Ablanida', 'email' => 'sample@email.com', 'phone' => '0922-666-7777'],
-            ['name' => 'Noelito Delumen', 'email' => 'sample@email.com', 'phone' => '0923-777-8888'],
-        ];
+        return Size::whereIn('name', array_keys($sizes))->get()->keyBy('name');
+    }
+
+    private function seedInventory()
+    {
+        InventoryLog::query()
+            ->where(function ($query) {
+                $query
+                    ->where('notes', 'Initial stock from week seeder.')
+                    ->orWhere('notes', 'Daily usage.')
+                    ->orWhere('notes', 'Initial stock from month seed data.')
+                    ->orWhere('notes', 'like', 'Seeded completed service:%');
+            })
+            ->delete();
 
         $categories = [
             'Cleaning Chemicals' => [
-                ['name' => 'Car Shampoo', 'sku' => 'CHEM-001', 'unit' => 'liters', 'cost' => 85.00, 'quantity' => 40, 'reorder_level' => 10],
-                ['name' => 'Tire Black', 'sku' => 'CHEM-002', 'unit' => 'liters', 'cost' => 120.00, 'quantity' => 15, 'reorder_level' => 5],
-                ['name' => 'Engine Degreaser', 'sku' => 'CHEM-003', 'unit' => 'liters', 'cost' => 150.00, 'quantity' => 12, 'reorder_level' => 5],
-                ['name' => 'Interior Freshener', 'sku' => 'CHEM-004', 'unit' => 'bottles', 'cost' => 65.00, 'quantity' => 25, 'reorder_level' => 8],
-                ['name' => 'Wax Polish', 'sku' => 'CHEM-005', 'unit' => 'bottles', 'cost' => 220.00, 'quantity' => 8, 'reorder_level' => 3],
+                'description' => 'Car wash liquids and detailing chemicals used during service work.',
+                'items' => [
+                    ['name' => 'Car Shampoo', 'description' => 'Foaming wash shampoo for exterior cleaning.', 'unit' => 'liters', 'cost' => 160.00, 'quantity' => 650, 'reorder_level' => 120],
+                    ['name' => 'Tire Black', 'description' => 'Tire dressing for finished wash jobs.', 'unit' => 'liters', 'cost' => 540.00, 'quantity' => 320, 'reorder_level' => 60],
+                    ['name' => 'Engine Degreaser', 'description' => 'Degreaser for engine bay and heavy grime.', 'unit' => 'liters', 'cost' => 260.00, 'quantity' => 260, 'reorder_level' => 50],
+                    ['name' => 'All Purpose Cleaner', 'description' => 'Dilutable cleaner for wheel wells, mats, and interior surfaces.', 'unit' => 'liters', 'cost' => 210.00, 'quantity' => 420, 'reorder_level' => 80],
+                    ['name' => 'Wax Polish', 'description' => 'Liquid wax polish for premium detail jobs.', 'unit' => 'liters', 'cost' => 580.00, 'quantity' => 180, 'reorder_level' => 35],
+                    ['name' => 'Quick Detailing Wax', 'description' => 'Spray wax used as a final detailer.', 'unit' => 'bottles', 'cost' => 95.00, 'quantity' => 240, 'reorder_level' => 45],
+                    ['name' => 'Interior Freshener', 'description' => 'Interior fragrance used after cleaning.', 'unit' => 'bottles', 'cost' => 75.00, 'quantity' => 260, 'reorder_level' => 50],
+                    ['name' => 'Glass Cleaner', 'description' => 'Windshield and window cleaner.', 'unit' => 'bottles', 'cost' => 90.00, 'quantity' => 240, 'reorder_level' => 45],
+                    ['name' => 'Wiper Wash', 'description' => 'Ready-to-use windshield washer fluid.', 'unit' => 'liters', 'cost' => 110.00, 'quantity' => 160, 'reorder_level' => 30],
+                ],
             ],
-            'Supplies'           => [
-                ['name' => 'Microfiber Towels', 'sku' => 'SUP-001', 'unit' => 'pcs', 'cost' => 35.00, 'quantity' => 50, 'reorder_level' => 15],
-                ['name' => 'Sponge Pads', 'sku' => 'SUP-002', 'unit' => 'pcs', 'cost' => 20.00, 'quantity' => 30, 'reorder_level' => 10],
-                ['name' => 'Glass Cleaner', 'sku' => 'SUP-003', 'unit' => 'bottles', 'cost' => 55.00, 'quantity' => 18, 'reorder_level' => 5],
+            'Supplies' => [
+                'description' => 'Reusable and consumable towels, pads, mitts, and hand tools.',
+                'items' => [
+                    ['name' => 'Microfiber Towels', 'description' => 'Automotive microfiber towels for drying and buffing.', 'unit' => 'pcs', 'cost' => 45.00, 'quantity' => 420, 'reorder_level' => 90],
+                    ['name' => 'Synthetic Chamois', 'description' => 'Synthetic chamois cloths for drying panels and glass.', 'unit' => 'pcs', 'cost' => 130.00, 'quantity' => 60, 'reorder_level' => 15],
+                    ['name' => 'Sponge Pads', 'description' => 'Large sponge pads for exterior hand washing.', 'unit' => 'pcs', 'cost' => 55.00, 'quantity' => 90, 'reorder_level' => 25],
+                    ['name' => 'Wash Mitt', 'description' => 'Microfiber wash mitts for safer contact washing.', 'unit' => 'pcs', 'cost' => 150.00, 'quantity' => 45, 'reorder_level' => 12],
+                    ['name' => 'All-purpose Rags', 'description' => 'General rags for lower panels, door jambs, and utility cleaning.', 'unit' => 'pcs', 'cost' => 12.00, 'quantity' => 520, 'reorder_level' => 120],
+                    ['name' => 'Detailing Brushes', 'description' => 'Small brushes for vents, badges, and tight trim areas.', 'unit' => 'pcs', 'cost' => 95.00, 'quantity' => 50, 'reorder_level' => 10],
+                ],
             ],
-            'Equipment'          => [
-                ['name' => 'Pressure Washer Nozzle', 'sku' => 'EQP-001', 'unit' => 'pcs', 'cost' => 450.00, 'quantity' => 4, 'reorder_level' => 2],
-                ['name' => 'Vacuum Filter Bag', 'sku' => 'EQP-002', 'unit' => 'pcs', 'cost' => 180.00, 'quantity' => 6, 'reorder_level' => 3],
+            'Equipment' => [
+                'description' => 'Replacement equipment parts and accessories used by the wash bay.',
+                'items' => [
+                    ['name' => 'Pressure Washer Nozzle', 'description' => 'Replacement nozzle tips for pressure washer use.', 'unit' => 'pcs', 'cost' => 480.00, 'quantity' => 10, 'reorder_level' => 3],
+                    ['name' => 'Vacuum Filter Bag', 'description' => 'Replacement filter bags for shop vacuum units.', 'unit' => 'pcs', 'cost' => 210.00, 'quantity' => 28, 'reorder_level' => 8],
+                    ['name' => 'Foam Cannon Bottle', 'description' => 'Foam cannon bottle for shampoo pre-wash.', 'unit' => 'pcs', 'cost' => 650.00, 'quantity' => 8, 'reorder_level' => 2],
+                    ['name' => 'Spray Bottle', 'description' => 'Trigger bottles for cleaners and diluted chemicals.', 'unit' => 'pcs', 'cost' => 45.00, 'quantity' => 80, 'reorder_level' => 20],
+                    ['name' => 'Hose Connector', 'description' => 'Quick-connect fittings for wash hoses.', 'unit' => 'pcs', 'cost' => 120.00, 'quantity' => 20, 'reorder_level' => 5],
+                ],
             ],
         ];
 
-        $staffUser = User::where('email', 'staff@jnj.com')->first();
+        foreach ($categories as $categoryName => $categoryData) {
+            $category = InventoryCategory::updateOrCreate(
+                ['name' => $categoryName],
+                ['name' => $categoryName, 'description' => $categoryData['description']]
+            );
 
-        foreach ($categories as $catName => $items) {
-            $cat = InventoryCategory::firstOrCreate(['name' => $catName]);
-            foreach ($items as $itemData) {
-                $item = InventoryItem::firstOrCreate(
-                    ['sku' => $itemData['sku']],
-                    array_merge($itemData, ['category_id' => $cat->id])
-                );
-                // initial stock-in log
-                if ($item->wasRecentlyCreated) {
-                    InventoryLog::create([
-                        'item_id'         => $item->id,
-                        'user_id'         => $staffUser?->id,
-                        'type'            => 'stock_in',
-                        'quantity'        => $item->quantity,
-                        'quantity_before' => 0,
-                        'quantity_after'  => $item->quantity,
-                        'notes'           => 'Initial stock from week seeder.',
-                    ]);
-                }
+            foreach ($categoryData['items'] as $itemData) {
+                $item = InventoryItem::firstOrNew(['name' => $itemData['name']]);
+                $item->fill(array_merge($itemData, [
+                    'category_id' => $category->id,
+                    'sku' => null,
+                ]));
+                $item->save();
+
+                $item->refreshStatus();
+
+                InventoryLog::create([
+                    'item_id' => $item->id,
+                    'user_id' => User::where('email', 'staff@jnj.com')->value('id'),
+                    'type' => 'stock_in',
+                    'quantity' => $item->quantity,
+                    'quantity_before' => 0,
+                    'quantity_after' => $item->quantity,
+                    'notes' => 'Initial stock from month seed data.',
+                ]);
             }
         }
 
-        $today    = Carbon::today();
-        $startDay = $today->copy()->subDays(6); // 7 days including today
+        return InventoryItem::whereIn('name', collect($categories)->flatMap(fn ($category) => collect($category['items'])->pluck('name'))->all())
+            ->orderBy('id')
+            ->get()
+            ->unique('name')
+            ->keyBy('name');
+    }
+
+    private function syncServiceInventory($services, $items): void
+    {
+        $serviceInventory = [
+            'Basic Wash' => [
+                'Car Shampoo' => 1,
+                'All-purpose Rags' => 1,
+            ],
+            'Full Wash' => [
+                'Car Shampoo' => 1,
+                'All Purpose Cleaner' => 1,
+                'Tire Black' => 1,
+                'Glass Cleaner' => 1,
+                'Interior Freshener' => 1,
+            ],
+            'Premium Detail' => [
+                'Car Shampoo' => 2,
+                'Wax Polish' => 1,
+                'Quick Detailing Wax' => 1,
+                'Tire Black' => 1,
+                'Glass Cleaner' => 1,
+                'Microfiber Towels' => 1,
+            ],
+            'Engine Wash' => [
+                'Engine Degreaser' => 2,
+                'All Purpose Cleaner' => 1,
+            ],
+        ];
+
+        foreach ($serviceInventory as $serviceName => $inventoryRows) {
+            $service = $services->get($serviceName);
+            if (! $service) {
+                continue;
+            }
+
+            $payload = [];
+            foreach ($inventoryRows as $itemName => $quantity) {
+                $item = $items->get($itemName);
+                if ($item) {
+                    $payload[$item->id] = ['quantity_per_service' => $quantity];
+                }
+            }
+
+            $service->inventoryItems()->sync($payload);
+        }
+    }
+
+    private function seedMonthlyAppointments($services, $sizes): array
+    {
+        $today = Carbon::today();
+        $startDay = $today->copy()->startOfMonth();
+        $endDay = $today->copy()->endOfMonth();
+
+        $this->removePreviousSeededAppointments($startDay, $endDay);
 
         $timeSlots = [
             '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
@@ -126,113 +254,200 @@ class DatabaseSeeder extends Seeder
             '15:00', '15:30', '16:00', '16:30',
         ];
 
-        $serviceNames = array_keys($serviceIds->toArray());
-        $sizeNames    = array_keys($sizeIds->toArray());
-        $statuses     = ['completed', 'completed', 'completed', 'completed', 'cancelled', 'no_show']; // weighted toward completed
-        $notesPool    = [
-            null,
-            'Regular customer.',
-            'Please be careful with the rims.',
-            'Has a baby seat - do not remove.',
-            'Customer will wait on-site.',
-            'Company fleet vehicle.',
-            'Gift card payment.',
-            null,
+        $plates = [
+            'NAA 4821', 'NBD 7194', 'NCE 3086', 'NDR 6429', 'NEH 1753',
+            'NFK 9042', 'NGM 2675', 'NHP 5318', 'NJR 8460', 'NKS 1937',
+            'NLB 6084', 'NMC 2749', 'NNF 7352', 'NPG 4106', 'NQH 9521',
+            'NRJ 3864', 'NSK 6207', 'NTM 1748', 'NVP 8093', 'NWR 2456',
+            'DAB 5917', 'DAE 8362', 'DAH 2704', 'DAK 9148', 'DAM 4635',
+            'DAP 7281', 'DAR 1596', 'DAT 6824', 'DAV 3079', 'DAX 9450',
+            'YAA 5216', 'YBC 8742', 'YDE 3195', 'YFG 6408', 'YHJ 2861',
+            'YKL 9573', 'YMN 4027', 'YPQ 7318', 'YRS 1684', 'YTV 5940',
         ];
 
-        $created = 0;
-        for ($d = 0; $d < 7; $d++) {
-            $date     = $startDay->copy()->addDays($d);
-            $isToday  = $date->isToday();
-            $isSunday = $date->isSunday();
-            // Fewer appointments on Sundays
-            $count = $isSunday ? rand(3, 5) : rand(6, 10);
+        $serviceNames = $services->keys()->values()->all();
+        $sizeNames = $sizes->keys()->values()->all();
+        $pastStatusPattern = [
+            'completed', 'completed', 'completed', 'completed', 'completed',
+            'completed', 'completed', 'cancelled', 'completed', 'no_show',
+        ];
 
-            // Pick random time slots for this day
-            $daySlots = collect($timeSlots)->shuffle()->take($count)->sort()->values();
-            foreach ($daySlots as $i => $time) {
-                $cust    = $customers[array_rand($customers)];
-                $svcName = $serviceNames[array_rand($serviceNames)];
-                $szName  = $sizeNames[array_rand($sizeNames)];
-                $service = Service::where('name', $svcName)->first();
-                $size    = Size::where('name', $szName)->first();
-                $price   = round(($service->price ?? 149.00) * ($size->multiplier ?? 1.00), 2);
+        $appointmentCount = 0;
+        $completedCount = 0;
 
-                // Today's appointments: mix of scheduled, in_progress, completed
-                if ($isToday) {
-                    $currentHour = (int) now()->format('H');
-                    $slotHour    = (int) substr($time, 0, 2);
+        for ($date = $startDay->copy(), $dayIndex = 0; $date->lte($endDay); $date->addDay(), $dayIndex++) {
+            $dailyCount = $this->dailyAppointmentCount($date, $dayIndex);
+            $daySlots = collect($timeSlots)
+                ->slice($dayIndex % 3)
+                ->take($dailyCount)
+                ->values();
 
-                    if ($slotHour > $currentHour) {
-                        $status = 'scheduled';
-                    } elseif ($slotHour == $currentHour) {
-                        $status = 'in_progress';
-                    } else {
-                        $status = (rand(1, 10) <= 8) ? 'completed' : 'cancelled';
-                    }
-                } else {
-                    // Past days — mostly completed
-                    $status = $statuses[array_rand($statuses)];
-                }
-
+            foreach ($daySlots as $slotIndex => $time) {
+                $serviceName = $serviceNames[($dayIndex + $slotIndex) % count($serviceNames)];
+                $sizeName = $sizeNames[($dayIndex + ($slotIndex * 2)) % count($sizeNames)];
+                $service = $services->get($serviceName);
+                $size = $sizes->get($sizeName);
+                $plate = $plates[($appointmentCount + $dayIndex) % count($plates)];
+                $status = $this->appointmentStatus($date, $time, $today, $pastStatusPattern, $dayIndex, $slotIndex);
+                $amount = null;
                 $completedAt = null;
-                $amount      = null;
 
                 if ($status === 'completed') {
-                    $amount      = $price;
+                    $amount = round(((float) $service->price) * ((float) $size->multiplier), 2);
                     $completedAt = $date->copy()
                         ->setTimeFromTimeString($time)
-                        ->addMinutes(rand(25, 55));
+                        ->addMinutes($this->serviceDuration($serviceName, (float) $size->multiplier));
                 }
 
-                Appointment::create([
-                    'date'           => $date->toDateString(),
-                    'time'           => $time,
-                    'service_id'     => $serviceIds[$svcName],
-                    'size_id'        => $sizeIds[$szName],
-                    'customer_name'  => $cust['name'],
-                    'customer_email' => $cust['email'],
-                    'customer_phone' => $cust['phone'],
-                    'notes'          => $notesPool[array_rand($notesPool)],
-                    'status'         => $status,
-                    'amount'         => $amount,
-                    'completed_at'   => $completedAt,
+                $appointment = Appointment::create([
+                    'date' => $date->toDateString(),
+                    'time' => $time,
+                    'service_id' => $service->id,
+                    'size_id' => $size->id,
+                    'customer_name' => '-',
+                    'customer_email' => null,
+                    'customer_phone' => null,
+                    'notes' => $this->appointmentNote($plate, $serviceName, $sizeName, $appointmentCount),
+                    'status' => $status,
+                    'amount' => $amount,
+                    'completed_at' => $completedAt,
                 ]);
 
-                $created++;
+                if ($status === 'completed') {
+                    $this->consumeInventoryForCompletedAppointment($appointment);
+                    $completedCount++;
+                }
+
+                $appointmentCount++;
             }
         }
 
-        $shampoo = InventoryItem::where('sku', 'CHEM-001')->first();
-        $towels  = InventoryItem::where('sku', 'SUP-001')->first();
-        $tireBlk = InventoryItem::where('sku', 'CHEM-002')->first();
+        return [
+            'appointments' => $appointmentCount,
+            'completed' => $completedCount,
+        ];
+    }
 
-        $usageItems = array_filter([$shampoo, $towels, $tireBlk]);
+    private function removePreviousSeededAppointments(Carbon $startDay, Carbon $endDay): void
+    {
+        $seededAppointmentIds = Appointment::query()
+            ->whereBetween('date', [$startDay->toDateString(), $endDay->toDateString()])
+            ->where(function ($query) {
+                $query
+                    ->where('customer_name', '-')
+                    ->orWhere('customer_email', 'sample@email.com');
+            })
+            ->pluck('id');
 
-        foreach ($usageItems as $item) {
-            for ($d = 6; $d >= 1; $d--) {
-                $usedQty = rand(1, 3);
-                $before  = $item->quantity;
-                $after   = max(0, $before - $usedQty);
+        if ($seededAppointmentIds->isEmpty()) {
+            return;
+        }
 
-                InventoryLog::create([
-                    'item_id'         => $item->id,
-                    'user_id'         => $staffUser?->id,
-                    'type'            => 'stock_out',
-                    'quantity'        => $usedQty,
-                    'quantity_before' => $before,
-                    'quantity_after'  => $after,
-                    'notes'           => 'Daily usage.',
-                    'created_at'      => now()->subDays($d),
-                    'updated_at'      => now()->subDays($d),
-                ]);
+        InventoryLog::query()
+            ->where('reference_type', 'appointment')
+            ->whereIn('reference_id', $seededAppointmentIds)
+            ->delete();
 
-                $item->quantity = $after;
+        Appointment::whereKey($seededAppointmentIds)->delete();
+    }
+
+    private function dailyAppointmentCount(Carbon $date, int $dayIndex): int
+    {
+        $base = match (true) {
+            $date->isSunday() => 5,
+            $date->isSaturday() => 8,
+            default => 10,
+        };
+
+        $variation = [0, 1, -1, 2, 0, -2, 1][$dayIndex % 7];
+
+        return max(4, min(12, $base + $variation));
+    }
+
+    private function appointmentStatus(
+        Carbon $date,
+        string $time,
+        Carbon $today,
+        array $pastStatusPattern,
+        int $dayIndex,
+        int $slotIndex
+    ): string {
+        if ($date->gt($today)) {
+            return 'scheduled';
+        }
+
+        if ($date->isSameDay($today)) {
+            $slotHour = (int) substr($time, 0, 2);
+            $currentHour = (int) now()->format('H');
+
+            if ($slotHour > $currentHour) {
+                return 'scheduled';
             }
+
+            if ($slotHour === $currentHour) {
+                return 'in_progress';
+            }
+        }
+
+        return $pastStatusPattern[($dayIndex + $slotIndex) % count($pastStatusPattern)];
+    }
+
+    private function serviceDuration(string $serviceName, float $sizeMultiplier): int
+    {
+        $baseMinutes = [
+            'Basic Wash' => 35,
+            'Full Wash' => 55,
+            'Premium Detail' => 110,
+            'Engine Wash' => 65,
+        ][$serviceName] ?? 45;
+
+        return (int) round($baseMinutes * max(1, $sizeMultiplier));
+    }
+
+    private function appointmentNote(string $plate, string $serviceName, string $sizeName, int $index): string
+    {
+        $templates = [
+            'Plate %s. Walk-in %s for %s vehicle; customer will return after service.',
+            'Plate %s. Focus on wheel wells and lower panels; muddy from provincial road.',
+            'Plate %s. Do not move dashboard items; interior belongings left in place.',
+            'Plate %s. Company unit; release after staff inspection.',
+            'Plate %s. Customer requested extra care on rims and side mirrors.',
+            'Plate %s. Light interior odor; apply freshener after cleaning.',
+            'Plate %s. Check windshield and wiper area before turnover.',
+            'Plate %s. Repeat vehicle from monthly operations list.',
+        ];
+
+        return sprintf($templates[$index % count($templates)], $plate, $serviceName, strtolower($sizeName));
+    }
+
+    private function consumeInventoryForCompletedAppointment(Appointment $appointment): void
+    {
+        $service = $appointment->service()->with('inventoryItems')->first();
+        if (! $service) {
+            return;
+        }
+
+        $staffUserId = User::where('email', 'staff@jnj.com')->value('id');
+        $multiplier = (float) ($appointment->size?->multiplier ?? 1);
+
+        foreach ($service->inventoryItems as $item) {
+            $used = max(1, (int) round(((float) $item->pivot->quantity_per_service) * $multiplier));
+            $before = $item->quantity;
+            $item->quantity = $before - $used;
             $item->save();
             $item->refreshStatus();
-        }
 
-        $this->command->info("Week seeded: {$created} appointments, inventory stocked & used.");
+            InventoryLog::create([
+                'item_id' => $item->id,
+                'user_id' => $staffUserId,
+                'type' => 'stock_out',
+                'quantity' => -$used,
+                'quantity_before' => $before,
+                'quantity_after' => $item->quantity,
+                'notes' => 'Seeded completed service: '.$service->name,
+                'reference_type' => 'appointment',
+                'reference_id' => $appointment->id,
+            ]);
+        }
     }
 }
