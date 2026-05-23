@@ -51,7 +51,7 @@
                         <div class="card border-0 rounded-4 shadow-sm mb-4">
                             <div class="card-body p-4">
                                 <h5 class="fw-bold mb-1">
-                                    <i class="fa-solid fa-spray-can-sparkles text-primary me-2"></i>
+                                    <i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>
                                     Choose a Service
                                 </h5>
                                 <p class="text-muted small mb-3">Select the wash package that best suits your needs.</p>
