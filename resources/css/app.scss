@@ -372,15 +372,15 @@ body {
 
 /* Size Buttons */
 .size-btn {
-    padding: 0.6rem 1.5rem;
-    border-radius: 50rem;
+    min-height: 96px;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
     border: 2px solid rgba(0, 0, 0, 0.1);
     background: #fff;
-    font-weight: 600;
-    font-size: 0.9rem;
     transition: all 0.2s ease;
     cursor: pointer;
     color: #333;
+    text-align: left;
 }
 
 .size-btn:hover {
@@ -390,8 +390,47 @@ body {
 
 .size-btn.active {
     border-color: $primary;
-    background: $primary;
-    color: #fff;
+    background: rgba(44, 165, 221, 0.06);
+    color: #1b88bb;
+    box-shadow: 0 8px 25px rgba(44, 165, 221, 0.12);
+}
+
+.size-btn-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.size-btn-name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+.size-btn-description {
+    display: block;
+    margin-top: 0.25rem;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.size-btn.active .size-btn-description {
+    color: #376f89;
+}
+
+.size-btn-multiplier {
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.size-btn.active .size-btn-multiplier {
+    color: #1b88bb;
 }
 
 /* Time Slot Group */

@@ -83,11 +83,18 @@
                                     Vehicle Size
                                 </h5>
                                 <p class="text-muted small mb-3">Pricing adjusts based on your vehicle size.</p>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <button v-for="size in sizes" :key="size.id" type="button" class="size-btn" :class="{ active: state.selectedSize === size.id }" @click="state.selectedSize = size.id">
-                                        {{ size.name }}
-                                        <span v-if="size.multiplier && Number(size.multiplier) !== 1" class="opacity-75 ms-1 small">×{{ size.multiplier }}</span>
-                                    </button>
+                                <div class="row g-2 g-md-3">
+                                    <div v-for="size in sizes" :key="size.id" class="col-12 col-md-4">
+                                        <button type="button" class="size-btn w-100 h-100" :class="{ active: state.selectedSize === size.id }" :aria-pressed="state.selectedSize === size.id" @click="state.selectedSize = size.id">
+                                            <span class="size-btn-main">
+                                                <span>
+                                                    <span class="size-btn-name">{{ size.name }}</span>
+                                                    <span v-if="size.description" class="size-btn-description">{{ size.description }}</span>
+                                                </span>
+                                                <span v-if="size.multiplier && Number(size.multiplier) !== 1" class="size-btn-multiplier">×{{ formatMultiplier(size.multiplier) }}</span>
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -457,6 +464,10 @@ export default {
 
         formatPrice(price) {
             return Number(price).toLocaleString("en-PH", { minimumFractionDigits: 2 });
+        },
+
+        formatMultiplier(multiplier) {
+            return Number(multiplier).toLocaleString("en-PH", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         },
 
         getConfig: function () {
