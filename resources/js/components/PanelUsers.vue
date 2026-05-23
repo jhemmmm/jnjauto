@@ -200,11 +200,12 @@
                                         <span v-if="isEditing" class="text-secondary fw-normal">(leave blank to keep current)</span>
                                     </label>
                                     <div class="input-group">
-                                        <input :type="showPassword ? 'text' : 'password'" class="form-control rounded-start-4" v-model="form.password" :required="!isEditing" minlength="8" :placeholder="isEditing ? 'Leave blank to keep current' : 'Min. 8 characters'" />
+                                        <input :type="showPassword ? 'text' : 'password'" class="form-control rounded-start-4" v-model="form.password" :required="!isEditing" minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}" :placeholder="isEditing ? 'Leave blank to keep current' : '8+ chars with Aa, number, symbol'" title="Use at least 8 characters with uppercase, lowercase, number, and special character." />
                                         <button type="button" class="btn btn-light border rounded-end-4" @click="showPassword = !showPassword">
                                             <i :class="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" class="text-secondary"></i>
                                         </button>
                                     </div>
+                                    <div class="text-secondary small mt-1">Use at least 8 characters with uppercase, lowercase, number, and special character.</div>
                                 </div>
                             </div>
 

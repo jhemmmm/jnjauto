@@ -57,11 +57,12 @@
                                         <span class="input-group-text bg-light border-0">
                                             <i class="fa-solid fa-lock text-secondary"></i>
                                         </span>
-                                        <input id="password" type="password" class="form-control border-0 bg-light @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="Enter new password">
+                                        <input id="password" type="password" class="form-control border-0 bg-light @error('password') is-invalid @enderror" name="password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}" autocomplete="new-password" placeholder="8+ chars with Aa, number, symbol" title="Use at least 8 characters with uppercase, lowercase, number, and special character.">
                                         <button class="btn bg-light border-0" type="button" id="togglePassword" aria-label="Show password">
                                             <i class="fa-solid fa-eye text-secondary" id="toggleIcon"></i>
                                         </button>
                                     </div>
+                                    <div class="text-secondary small mt-1">Use at least 8 characters with uppercase, lowercase, number, and special character.</div>
                                     @error('password')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror

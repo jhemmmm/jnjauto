@@ -72,7 +72,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">New Password</label>
                                     <div class="input-group">
-                                        <input :type="showPasswords.new ? 'text' : 'password'" class="form-control rounded-start-4" v-model="passwordForm.password" required minlength="8" />
+                                        <input :type="showPasswords.new ? 'text' : 'password'" class="form-control rounded-start-4" v-model="passwordForm.password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}" :title="passwordRequirementText" />
                                         <button type="button" class="btn btn-light border rounded-end-4" @click="showPasswords.new = !showPasswords.new">
                                             <i :class="showPasswords.new ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" class="text-secondary"></i>
                                         </button>
@@ -430,27 +430,25 @@ export default {
             return this.allTabs.filter((tab) => !tab.adminOnly || this.isAdmin);
         },
         passwordValid() {
-            return this.passwordForm.current_password.length > 0 && this.passwordForm.password.length >= 8 && this.passwordForm.password === this.passwordForm.password_confirmation;
+            return this.passwordForm.current_password.length > 0 && this.passwordHasRequiredComplexity && this.passwordForm.password === this.passwordForm.password_confirmation;
+        },
+        passwordRequirementText() {
+            return "Use at least 8 characters with uppercase, lowercase, number, and special character.";
+        },
+        passwordHasRequiredComplexity() {
+            return this.hasRequiredPasswordComplexity(this.passwordForm.password);
         },
         passwordStrengthLabel() {
             const p = this.passwordForm.password;
-            if (!p) return "Enter a password";
+            if (!p) return this.passwordRequirementText;
             if (p.length < 8) return "Too short (min 8 characters)";
-            let strength = 0;
-            if (/[a-z]/.test(p)) strength++;
-            if (/[A-Z]/.test(p)) strength++;
-            if (/[0-9]/.test(p)) strength++;
-            if (/[^a-zA-Z0-9]/.test(p)) strength++;
-            if (p.length >= 12) strength++;
-            if (strength <= 2) return "Weak";
-            if (strength <= 3) return "Fair";
-            return "Strong";
+            if (!this.passwordHasRequiredComplexity) return "Needs uppercase, lowercase, number, and symbol";
+            return "Meets password requirements";
         },
         passwordStrengthColor() {
             const label = this.passwordStrengthLabel;
-            if (label === "Strong") return "text-success";
-            if (label === "Fair") return "text-warning";
-            if (label === "Weak") return "text-danger";
+            if (label === "Meets password requirements") return "text-success";
+            if (this.passwordForm.password) return "text-danger";
             return "text-secondary";
         },
     },
@@ -460,6 +458,10 @@ export default {
     },
 
     methods: {
+        hasRequiredPasswordComplexity(password) {
+            return password.length >= 8 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^a-zA-Z0-9]/.test(password);
+        },
+
         async fetchSettings() {
             this.loading = true;
             try {

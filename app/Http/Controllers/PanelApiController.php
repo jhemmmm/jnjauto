@@ -19,6 +19,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\Password;
 
 class PanelApiController extends Controller
 {
@@ -1209,7 +1210,7 @@ class PanelApiController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
         ]);
 
         $user = auth()->user();
@@ -1328,7 +1329,7 @@ class PanelApiController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8',
+            'password' => ['required', 'string', Password::defaults()],
             'role_id' => 'required|exists:roles,id',
         ]);
 
@@ -1351,7 +1352,7 @@ class PanelApiController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'role_id' => 'required|exists:roles,id',
-            'password' => 'nullable|string|min:8',
+            'password' => ['nullable', 'string', Password::defaults()],
         ]);
 
         $data = $request->only('name', 'email', 'role_id');

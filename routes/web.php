@@ -40,7 +40,7 @@ Route::group(['prefix' => 'service', 'as' => 'service.'], function () {
     });
 });
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::group(['prefix' => 'panel', 'as' => 'panel.'], function () {
     // Page routes (just return views — Vue components handle all data)
