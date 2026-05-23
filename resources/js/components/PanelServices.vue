@@ -77,10 +77,10 @@
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-end gap-1">
-                                        <button class="btn btn-sm btn-light border rounded-3 px-2" @click="editService(s)">
+                                        <button class="btn btn-sm btn-light border rounded-3 px-2" @click="editService(s)" title="Edit service" aria-label="Edit service">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-light border rounded-3 px-2 text-danger" @click="deleteService(s)">
+                                        <button class="btn btn-sm btn-light border rounded-3 px-2 text-danger" @click="deleteService(s)" title="Delete service" aria-label="Delete service">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
@@ -139,10 +139,10 @@
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-end gap-1">
-                                        <button class="btn btn-sm btn-light border rounded-3 px-2" @click="editSize(sz)">
+                                        <button class="btn btn-sm btn-light border rounded-3 px-2" @click="editSize(sz)" title="Edit size" aria-label="Edit size">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-light border rounded-3 px-2 text-danger" @click="deleteSize(sz)">
+                                        <button class="btn btn-sm btn-light border rounded-3 px-2 text-danger" @click="deleteSize(sz)" title="Delete size" aria-label="Delete size">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>

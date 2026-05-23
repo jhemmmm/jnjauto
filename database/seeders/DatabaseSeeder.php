@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    private const APPOINTMENT_SEED_START = '2026-03-01';
+
+    private const APPOINTMENT_SEED_END = '2026-03-24';
+
+    private const APPOINTMENT_REVENUE_LIMIT = 30000.00;
+
     /**
      * Seed the application's database.
      */
@@ -35,7 +41,7 @@ class DatabaseSeeder extends Seeder
             $created = $this->seedMonthlyAppointments($services, $sizes);
 
             $this->command->info(
-                "Month seeded: {$created['appointments']} appointments, {$created['completed']} completed sales, inventory stocked with empty SKUs."
+                "Seed data created: {$created['appointments']} appointments, {$created['completed']} completed sales, PHP ".number_format($created['revenue'], 2).' revenue, inventory stocked with empty SKUs.'
             );
         });
     }
@@ -56,12 +62,12 @@ class DatabaseSeeder extends Seeder
         $staffRole = Role::where('name', 'Staff')->first();
 
         User::updateOrCreate(
-            ['email' => 'admin@jnj.com'],
+            ['email' => 'admin@unhs.school'],
             ['name' => 'Admin', 'password' => bcrypt('password'), 'role_id' => $adminRole?->id]
         );
 
         User::updateOrCreate(
-            ['email' => 'staff@jnj.com'],
+            ['email' => 'staff@unhs.school'],
             ['name' => 'Jonel Alimuin', 'password' => bcrypt('password'), 'role_id' => $staffRole?->id]
         );
     }
@@ -177,7 +183,7 @@ class DatabaseSeeder extends Seeder
 
                 InventoryLog::create([
                     'item_id' => $item->id,
-                    'user_id' => User::where('email', 'staff@jnj.com')->value('id'),
+                    'user_id' => User::where('email', 'staff@unhs.school')->value('id'),
                     'type' => 'stock_in',
                     'quantity' => $item->quantity,
                     'quantity_before' => 0,
@@ -243,10 +249,8 @@ class DatabaseSeeder extends Seeder
     private function seedMonthlyAppointments($services, $sizes): array
     {
         $today = Carbon::today();
-        $startDay = $today->copy()->startOfMonth();
-        $endDay = $today->copy()->endOfMonth();
-
-        $this->removePreviousSeededAppointments($startDay, $endDay);
+        $startDay = Carbon::parse(self::APPOINTMENT_SEED_START)->startOfDay();
+        $endDay = Carbon::parse(self::APPOINTMENT_SEED_END)->startOfDay();
 
         $timeSlots = [
             '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
@@ -273,36 +277,45 @@ class DatabaseSeeder extends Seeder
 
         $customers = [
             ['name' => '-', 'email' => null, 'phone' => null],
-            ['name' => 'Jose Rizal Santos', 'email' => 'jose.santos@example.com', 'phone' => '0917-204-6815'],
-            ['name' => 'Maria Clara Reyes', 'email' => 'maria.reyes@example.com', 'phone' => '0918-572-3094'],
-            ['name' => 'Andres Bonifacio Cruz', 'email' => 'andres.cruz@example.com', 'phone' => '0919-836-4720'],
-            ['name' => 'Gabriela Silang Dela Cruz', 'email' => 'gabriela.delacruz@example.com', 'phone' => '0920-461-7538'],
+            ['name' => 'Jose Rizal Santos', 'email' => 'jose.santos@gmail.com', 'phone' => '0917-204-6815'],
+            ['name' => 'Maria Clara Reyes', 'email' => 'maria.reyes@gmail.com', 'phone' => '0918-572-3094'],
+            ['name' => 'Andres Bonifacio Cruz', 'email' => 'andres.cruz@gmail.com', 'phone' => '0919-836-4720'],
+            ['name' => 'Gabriela Silang Dela Cruz', 'email' => 'gabriela.delacruz@gmail.com', 'phone' => '0920-461-7538'],
             ['name' => '-', 'email' => null, 'phone' => null],
             ['name' => 'Emilio Aguinaldo Garcia', 'email' => null, 'phone' => '0921-690-2847'],
-            ['name' => 'Corazon Aquino Mendoza', 'email' => 'corazon.mendoza@example.com', 'phone' => null],
-            ['name' => 'Juan Dela Cruz', 'email' => 'juan.delacruz@example.com', 'phone' => '0922-157-9063'],
+            ['name' => 'Corazon Aquino Mendoza', 'email' => 'corazon.mendoza@gmail.com', 'phone' => null],
+            ['name' => 'Juan Dela Cruz', 'email' => 'juan.delacruz@gmail.com', 'phone' => '0922-157-9063'],
             ['name' => 'Luzviminda Bautista', 'email' => null, 'phone' => '0923-804-5196'],
             ['name' => '-', 'email' => null, 'phone' => null],
-            ['name' => 'Ramon Magsaysay Flores', 'email' => 'ramon.flores@example.com', 'phone' => '0925-638-2419'],
-            ['name' => 'Nena Villanueva', 'email' => 'nena.villanueva@example.com', 'phone' => '0926-475-8301'],
+            ['name' => 'Ramon Magsaysay Flores', 'email' => 'ramon.flores@gmail.com', 'phone' => '0925-638-2419'],
+            ['name' => 'Nena Villanueva', 'email' => 'nena.villanueva@gmail.com', 'phone' => '0926-475-8301'],
             ['name' => 'Mark Anthony Soriano', 'email' => null, 'phone' => '0927-913-6048'],
-            ['name' => 'Angelica Navarro', 'email' => 'angelica.navarro@example.com', 'phone' => null],
+            ['name' => 'Angelica Navarro', 'email' => 'angelica.navarro@gmail.com', 'phone' => null],
             ['name' => '-', 'email' => null, 'phone' => null],
-            ['name' => 'Paolo Villamor', 'email' => 'paolo.villamor@example.com', 'phone' => '0928-340-7652'],
+            ['name' => 'Paolo Villamor', 'email' => 'paolo.villamor@gmail.com', 'phone' => '0928-340-7652'],
             ['name' => 'Cristina Mallari', 'email' => null, 'phone' => '0929-582-1470'],
-            ['name' => 'Roberto De Leon', 'email' => 'roberto.deleon@example.com', 'phone' => '0930-719-4265'],
-            ['name' => 'Andrea Magtanggol', 'email' => 'andrea.magtanggol@example.com', 'phone' => '0931-264-8907'],
+            ['name' => 'Roberto De Leon', 'email' => 'roberto.deleon@gmail.com', 'phone' => '0930-719-4265'],
+            ['name' => 'Andrea Magtanggol', 'email' => 'andrea.magtanggol@gmail.com', 'phone' => '0931-264-8907'],
             ['name' => '-', 'email' => null, 'phone' => null],
             ['name' => 'Jocelyn Manalo', 'email' => null, 'phone' => '0932-856-3014'],
-            ['name' => 'Benjie Ramos', 'email' => 'benjie.ramos@example.com', 'phone' => null],
-            ['name' => 'Michelle Santiago', 'email' => 'michelle.santiago@example.com', 'phone' => '0933-608-5179'],
+            ['name' => 'Benjie Ramos', 'email' => 'benjie.ramos@gmail.com', 'phone' => null],
+            ['name' => 'Michelle Santiago', 'email' => 'michelle.santiago@gmail.com', 'phone' => '0933-608-5179'],
             ['name' => 'Daniel Fernandez', 'email' => null, 'phone' => '0935-174-9628'],
             ['name' => '-', 'email' => null, 'phone' => null],
-            ['name' => 'Alyssa Mercado', 'email' => 'alyssa.mercado@example.com', 'phone' => '0936-482-7051'],
+            ['name' => 'Alyssa Mercado', 'email' => 'alyssa.mercado@gmail.com', 'phone' => '0936-482-7051'],
             ['name' => 'Francisca Tolentino', 'email' => null, 'phone' => null],
-            ['name' => 'Edgardo Lacson', 'email' => 'edgardo.lacson@example.com', 'phone' => '0938-715-2940'],
-            ['name' => 'Marites Salazar', 'email' => 'marites.salazar@example.com', 'phone' => '0939-260-8475'],
+            ['name' => 'Edgardo Lacson', 'email' => 'edgardo.lacson@gmail.com', 'phone' => '0938-715-2940'],
+            ['name' => 'Marites Salazar', 'email' => 'marites.salazar@gmail.com', 'phone' => '0939-260-8475'],
         ];
+
+        $seededCustomerNames = collect($customers)
+            ->pluck('name')
+            ->reject(fn (string $name) => $name === '-')
+            ->unique()
+            ->values()
+            ->all();
+
+        $this->removePreviousSeededAppointments($startDay, $startDay->copy()->endOfMonth(), $seededCustomerNames);
 
         $serviceNames = $services->keys()->values()->all();
         $sizeNames = $sizes->keys()->values()->all();
@@ -313,9 +326,10 @@ class DatabaseSeeder extends Seeder
 
         $appointmentCount = 0;
         $completedCount = 0;
+        $seededRevenue = 0.0;
 
         for ($date = $startDay->copy(), $dayIndex = 0; $date->lte($endDay); $date->addDay(), $dayIndex++) {
-            $dailyCount = $this->dailyAppointmentCount($date, $dayIndex);
+            $dailyCount = $this->dailyAppointmentCount($date);
             $daySlots = collect($timeSlots)
                 ->slice($dayIndex % 3)
                 ->take($dailyCount)
@@ -334,9 +348,15 @@ class DatabaseSeeder extends Seeder
 
                 if ($status === 'completed') {
                     $amount = round(((float) $service->price) * ((float) $size->multiplier), 2);
-                    $completedAt = $date->copy()
-                        ->setTimeFromTimeString($time)
-                        ->addMinutes($this->serviceDuration($serviceName, (float) $size->multiplier));
+                    if (($seededRevenue + $amount) >= self::APPOINTMENT_REVENUE_LIMIT) {
+                        $status = 'no_show';
+                        $amount = null;
+                    } else {
+                        $completedAt = $date->copy()
+                            ->setTimeFromTimeString($time)
+                            ->addMinutes($this->serviceDuration($serviceName, (float) $size->multiplier));
+                        $seededRevenue += $amount;
+                    }
                 }
 
                 $appointment = Appointment::create([
@@ -365,18 +385,22 @@ class DatabaseSeeder extends Seeder
         return [
             'appointments' => $appointmentCount,
             'completed' => $completedCount,
+            'revenue' => $seededRevenue,
         ];
     }
 
-    private function removePreviousSeededAppointments(Carbon $startDay, Carbon $endDay): void
+    private function removePreviousSeededAppointments(Carbon $startDay, Carbon $endDay, array $seededCustomerNames): void
     {
         $seededAppointmentIds = Appointment::query()
             ->whereBetween('date', [$startDay->toDateString(), $endDay->toDateString()])
-            ->where(function ($query) {
+            ->where(function ($query) use ($seededCustomerNames) {
                 $query
                     ->where('customer_name', '-')
-                    ->orWhere('customer_email', 'sample@email.com')
-                    ->orWhere('customer_email', 'like', '%@example.com');
+                    ->orWhere(function ($query) use ($seededCustomerNames) {
+                        $query
+                            ->whereIn('customer_name', $seededCustomerNames)
+                            ->where('notes', 'like', '___ ____');
+                    });
             })
             ->pluck('id');
 
@@ -392,17 +416,13 @@ class DatabaseSeeder extends Seeder
         Appointment::whereKey($seededAppointmentIds)->delete();
     }
 
-    private function dailyAppointmentCount(Carbon $date, int $dayIndex): int
+    private function dailyAppointmentCount(Carbon $date): int
     {
-        $base = match (true) {
-            $date->isSunday() => 5,
-            $date->isSaturday() => 8,
-            default => 10,
+        return match (true) {
+            $date->isSunday() => 1,
+            $date->isSaturday() => 3,
+            default => 2,
         };
-
-        $variation = [0, 1, -1, 2, 0, -2, 1][$dayIndex % 7];
-
-        return max(4, min(12, $base + $variation));
     }
 
     private function appointmentStatus(
@@ -457,7 +477,7 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $staffUserId = User::where('email', 'staff@jnj.com')->value('id');
+        $staffUserId = User::where('email', 'staff@unhs.school')->value('id');
         $multiplier = (float) ($appointment->size?->multiplier ?? 1);
 
         foreach ($service->inventoryItems as $item) {

@@ -137,13 +137,13 @@
                                     <td>
                                         <div class="d-flex justify-content-end gap-1">
                                             <!-- Edit -->
-                                            <button class="btn btn-sm btn-light border rounded-3 px-2" @click="editAppointment(a)">
+                                            <button class="btn btn-sm btn-light border rounded-3 px-2" @click="editAppointment(a)" title="Edit appointment" aria-label="Edit appointment">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
 
                                             <!-- Status dropdown -->
                                             <div class="dropdown">
-                                                <button class="btn btn-sm btn-light border rounded-3 px-2" type="button" data-bs-toggle="dropdown">
+                                                <button class="btn btn-sm btn-light border rounded-3 px-2" type="button" data-bs-toggle="dropdown" title="Change status" aria-label="Change status">
                                                     <i class="fa-solid fa-arrow-right-arrow-left"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end rounded-4 shadow-sm border-0 p-2">
@@ -158,12 +158,12 @@
                                             </div>
 
                                             <!-- View -->
-                                            <button class="btn btn-sm btn-light border rounded-3 px-2" @click="viewAppointment(a)">
+                                            <button class="btn btn-sm btn-light border rounded-3 px-2" @click="viewAppointment(a)" title="View appointment" aria-label="View appointment">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
 
                                             <!-- Delete -->
-                                            <button class="btn btn-sm btn-light border rounded-3 px-2 text-danger" @click="deleteAppointment(a)">
+                                            <button class="btn btn-sm btn-light border rounded-3 px-2 text-danger" @click="deleteAppointment(a)" title="Delete appointment" aria-label="Delete appointment">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </div>
@@ -182,7 +182,7 @@
                                     <div class="small text-secondary" v-if="a.customer_phone">{{ a.customer_phone }}</div>
                                 </div>
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-light border rounded-3 px-2" type="button" data-bs-toggle="dropdown">
+                                    <button class="btn btn-sm btn-light border rounded-3 px-2" type="button" data-bs-toggle="dropdown" title="Appointment actions" aria-label="Appointment actions">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end rounded-4 shadow-sm border-0 p-2">
