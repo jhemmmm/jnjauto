@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AppointmentConfirmation;
+use App\Mail\AppointmentStatusUpdated;
 use App\Models\Appointment;
 use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
@@ -16,6 +18,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PanelApiController extends Controller
 {
@@ -297,6 +300,10 @@ class PanelApiController extends Controller
             ['appointment_id' => $appointment->id]
         );
 
+        if ($appointment->customer_email) {
+            Mail::to($appointment->customer_email)->send(new AppointmentConfirmation($appointment));
+        }
+
         return response()->json(['message' => 'Appointment created successfully.', 'appointment' => $appointment]);
     }
 
@@ -412,7 +419,13 @@ class PanelApiController extends Controller
             ['appointment_id' => $appointment->id]
         );
 
-        return response()->json(['message' => 'Status updated successfully.', 'appointment' => $appointment->fresh()->load(['service', 'size'])]);
+        $appointment = $appointment->fresh()->load(['service', 'size']);
+
+        if ($appointment->customer_email) {
+            Mail::to($appointment->customer_email)->send(new AppointmentStatusUpdated($appointment));
+        }
+
+        return response()->json(['message' => 'Status updated successfully.', 'appointment' => $appointment]);
     }
 
     /**

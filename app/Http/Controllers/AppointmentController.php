@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Mail\AppointmentConfirmation;
 use App\Models\Appointment;
 use App\Models\Notification;
 use App\Models\Setting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -25,15 +27,15 @@ class AppointmentController extends Controller
         $closingTime = Setting::get('closing_time', '17:00');
 
         return response()->json([
-            'open_hour'     => (int) substr($openingTime, 0, 2),
-            'open_minute'   => (int) substr($openingTime, 3, 2),
-            'close_hour'    => (int) substr($closingTime, 0, 2),
-            'close_minute'  => (int) substr($closingTime, 3, 2),
-            'slot_minutes'  => (int) Setting::get('slot_duration', 30),
+            'open_hour' => (int) substr($openingTime, 0, 2),
+            'open_minute' => (int) substr($openingTime, 3, 2),
+            'close_hour' => (int) substr($closingTime, 0, 2),
+            'close_minute' => (int) substr($closingTime, 3, 2),
+            'slot_minutes' => (int) Setting::get('slot_duration', 30),
             'slot_capacity' => (int) Setting::get('slot_capacity', 2),
             'business_name' => Setting::get('business_name', 'JNJ Auto Car Wash'),
             'business_phone' => Setting::get('business_phone', '(555) 123-4567'),
-            'currency'      => Setting::get('currency', 'PHP'),
+            'currency' => Setting::get('currency', 'PHP'),
         ]);
     }
 
@@ -67,7 +69,7 @@ class AppointmentController extends Controller
         $requestTime = $request->input('time');
 
         if ($requestTime < $openingTime || $requestTime >= $closingTime) {
-            return response()->json(['message' => 'Selected time is outside operating hours (' . $openingTime . ' – ' . $closingTime . ').'], 422);
+            return response()->json(['message' => 'Selected time is outside operating hours ('.$openingTime.' – '.$closingTime.').'], 422);
         }
 
         // Validate slot capacity
@@ -97,12 +99,14 @@ class AppointmentController extends Controller
         Notification::notifyAdmins(
             'appointment_created',
             'New Appointment Booked',
-            $appointment->customer_name . ' booked a ' . ($appointment->service->name ?? 'service') . ' for ' . \Carbon\Carbon::parse($appointment->date)->format('M d, Y') . ' at ' . \Carbon\Carbon::parse($appointment->time)->format('g:i A') . '.',
+            $appointment->customer_name.' booked a '.($appointment->service->name ?? 'service').' for '.\Carbon\Carbon::parse($appointment->date)->format('M d, Y').' at '.\Carbon\Carbon::parse($appointment->time)->format('g:i A').'.',
             'fa-solid fa-calendar-plus',
             'primary',
             '/panel/appointments',
             ['appointment_id' => $appointment->id]
         );
+
+        Mail::to($appointment->customer_email)->send(new AppointmentConfirmation($appointment));
 
         return response()->json($appointment);
     }

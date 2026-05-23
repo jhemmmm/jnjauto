@@ -125,36 +125,36 @@ class DatabaseSeeder extends Seeder
             'Cleaning Chemicals' => [
                 'description' => 'Car wash liquids and detailing chemicals used during service work.',
                 'items' => [
-                    ['name' => 'Car Shampoo', 'description' => 'Foaming wash shampoo for exterior cleaning.', 'unit' => 'liters', 'cost' => 160.00, 'quantity' => 650, 'reorder_level' => 120],
-                    ['name' => 'Tire Black', 'description' => 'Tire dressing for finished wash jobs.', 'unit' => 'liters', 'cost' => 540.00, 'quantity' => 320, 'reorder_level' => 60],
-                    ['name' => 'Engine Degreaser', 'description' => 'Degreaser for engine bay and heavy grime.', 'unit' => 'liters', 'cost' => 260.00, 'quantity' => 260, 'reorder_level' => 50],
-                    ['name' => 'All Purpose Cleaner', 'description' => 'Dilutable cleaner for wheel wells, mats, and interior surfaces.', 'unit' => 'liters', 'cost' => 210.00, 'quantity' => 420, 'reorder_level' => 80],
-                    ['name' => 'Wax Polish', 'description' => 'Liquid wax polish for premium detail jobs.', 'unit' => 'liters', 'cost' => 580.00, 'quantity' => 180, 'reorder_level' => 35],
-                    ['name' => 'Quick Detailing Wax', 'description' => 'Spray wax used as a final detailer.', 'unit' => 'bottles', 'cost' => 95.00, 'quantity' => 240, 'reorder_level' => 45],
-                    ['name' => 'Interior Freshener', 'description' => 'Interior fragrance used after cleaning.', 'unit' => 'bottles', 'cost' => 75.00, 'quantity' => 260, 'reorder_level' => 50],
-                    ['name' => 'Glass Cleaner', 'description' => 'Windshield and window cleaner.', 'unit' => 'bottles', 'cost' => 90.00, 'quantity' => 240, 'reorder_level' => 45],
-                    ['name' => 'Wiper Wash', 'description' => 'Ready-to-use windshield washer fluid.', 'unit' => 'liters', 'cost' => 110.00, 'quantity' => 160, 'reorder_level' => 30],
+                    ['name' => 'Car Shampoo', 'description' => 'Foaming wash shampoo for exterior cleaning.', 'unit' => 'liters', 'cost' => 30.00, 'quantity' => 330, 'reorder_level' => 40],
+                    ['name' => 'Tire Black', 'description' => 'Tire dressing for finished wash jobs.', 'unit' => 'liters', 'cost' => 45.00, 'quantity' => 160, 'reorder_level' => 30],
+                    ['name' => 'Engine Degreaser', 'description' => 'Degreaser for engine bay and heavy grime.', 'unit' => 'liters', 'cost' => 50.00, 'quantity' => 120, 'reorder_level' => 25],
+                    ['name' => 'All Purpose Cleaner', 'description' => 'Dilutable cleaner for wheel wells, mats, and interior surfaces.', 'unit' => 'liters', 'cost' => 35.00, 'quantity' => 130, 'reorder_level' => 25],
+                    ['name' => 'Wax Polish', 'description' => 'Liquid wax polish for premium detail jobs.', 'unit' => 'liters', 'cost' => 120.00, 'quantity' => 105, 'reorder_level' => 15],
+                    ['name' => 'Quick Detailing Wax', 'description' => 'Spray wax used as a final detailer.', 'unit' => 'bottles', 'cost' => 65.00, 'quantity' => 105, 'reorder_level' => 18],
+                    ['name' => 'Interior Freshener', 'description' => 'Interior fragrance used after cleaning.', 'unit' => 'bottles', 'cost' => 45.00, 'quantity' => 80, 'reorder_level' => 20],
+                    ['name' => 'Glass Cleaner', 'description' => 'Windshield and window cleaner.', 'unit' => 'bottles', 'cost' => 45.00, 'quantity' => 160, 'reorder_level' => 25],
+                    ['name' => 'Wiper Wash', 'description' => 'Ready-to-use windshield washer fluid.', 'unit' => 'liters', 'cost' => 35.00, 'quantity' => 35, 'reorder_level' => 10],
                 ],
             ],
             'Supplies' => [
                 'description' => 'Reusable and consumable towels, pads, mitts, and hand tools.',
                 'items' => [
-                    ['name' => 'Microfiber Towels', 'description' => 'Automotive microfiber towels for drying and buffing.', 'unit' => 'pcs', 'cost' => 45.00, 'quantity' => 420, 'reorder_level' => 90],
-                    ['name' => 'Synthetic Chamois', 'description' => 'Synthetic chamois cloths for drying panels and glass.', 'unit' => 'pcs', 'cost' => 130.00, 'quantity' => 60, 'reorder_level' => 15],
-                    ['name' => 'Sponge Pads', 'description' => 'Large sponge pads for exterior hand washing.', 'unit' => 'pcs', 'cost' => 55.00, 'quantity' => 90, 'reorder_level' => 25],
-                    ['name' => 'Wash Mitt', 'description' => 'Microfiber wash mitts for safer contact washing.', 'unit' => 'pcs', 'cost' => 150.00, 'quantity' => 45, 'reorder_level' => 12],
-                    ['name' => 'All-purpose Rags', 'description' => 'General rags for lower panels, door jambs, and utility cleaning.', 'unit' => 'pcs', 'cost' => 12.00, 'quantity' => 520, 'reorder_level' => 120],
-                    ['name' => 'Detailing Brushes', 'description' => 'Small brushes for vents, badges, and tight trim areas.', 'unit' => 'pcs', 'cost' => 95.00, 'quantity' => 50, 'reorder_level' => 10],
+                    ['name' => 'Microfiber Towels', 'description' => 'Automotive microfiber towels for drying and buffing.', 'unit' => 'pcs', 'cost' => 35.00, 'quantity' => 120, 'reorder_level' => 30],
+                    ['name' => 'Synthetic Chamois', 'description' => 'Synthetic chamois cloths for drying panels and glass.', 'unit' => 'pcs', 'cost' => 75.00, 'quantity' => 15, 'reorder_level' => 5],
+                    ['name' => 'Sponge Pads', 'description' => 'Large sponge pads for exterior hand washing.', 'unit' => 'pcs', 'cost' => 45.00, 'quantity' => 25, 'reorder_level' => 8],
+                    ['name' => 'Wash Mitt', 'description' => 'Microfiber wash mitts for safer contact washing.', 'unit' => 'pcs', 'cost' => 80.00, 'quantity' => 12, 'reorder_level' => 4],
+                    ['name' => 'All-purpose Rags', 'description' => 'General rags for lower panels, door jambs, and utility cleaning.', 'unit' => 'pcs', 'cost' => 8.00, 'quantity' => 130, 'reorder_level' => 35],
+                    ['name' => 'Detailing Brushes', 'description' => 'Small brushes for vents, badges, and tight trim areas.', 'unit' => 'pcs', 'cost' => 65.00, 'quantity' => 12, 'reorder_level' => 4],
                 ],
             ],
             'Equipment' => [
                 'description' => 'Replacement equipment parts and accessories used by the wash bay.',
                 'items' => [
-                    ['name' => 'Pressure Washer Nozzle', 'description' => 'Replacement nozzle tips for pressure washer use.', 'unit' => 'pcs', 'cost' => 480.00, 'quantity' => 10, 'reorder_level' => 3],
-                    ['name' => 'Vacuum Filter Bag', 'description' => 'Replacement filter bags for shop vacuum units.', 'unit' => 'pcs', 'cost' => 210.00, 'quantity' => 28, 'reorder_level' => 8],
-                    ['name' => 'Foam Cannon Bottle', 'description' => 'Foam cannon bottle for shampoo pre-wash.', 'unit' => 'pcs', 'cost' => 650.00, 'quantity' => 8, 'reorder_level' => 2],
-                    ['name' => 'Spray Bottle', 'description' => 'Trigger bottles for cleaners and diluted chemicals.', 'unit' => 'pcs', 'cost' => 45.00, 'quantity' => 80, 'reorder_level' => 20],
-                    ['name' => 'Hose Connector', 'description' => 'Quick-connect fittings for wash hoses.', 'unit' => 'pcs', 'cost' => 120.00, 'quantity' => 20, 'reorder_level' => 5],
+                    ['name' => 'Pressure Washer Nozzle', 'description' => 'Replacement nozzle tips for pressure washer use.', 'unit' => 'pcs', 'cost' => 300.00, 'quantity' => 2, 'reorder_level' => 1],
+                    ['name' => 'Vacuum Filter Bag', 'description' => 'Replacement filter bags for shop vacuum units.', 'unit' => 'pcs', 'cost' => 140.00, 'quantity' => 6, 'reorder_level' => 2],
+                    ['name' => 'Foam Cannon Bottle', 'description' => 'Foam cannon bottle for shampoo pre-wash.', 'unit' => 'pcs', 'cost' => 500.00, 'quantity' => 1, 'reorder_level' => 1],
+                    ['name' => 'Spray Bottle', 'description' => 'Trigger bottles for cleaners and diluted chemicals.', 'unit' => 'pcs', 'cost' => 29.00, 'quantity' => 15, 'reorder_level' => 5],
+                    ['name' => 'Hose Connector', 'description' => 'Quick-connect fittings for wash hoses.', 'unit' => 'pcs', 'cost' => 90.00, 'quantity' => 5, 'reorder_level' => 2],
                 ],
             ],
         ];
@@ -263,6 +263,45 @@ class DatabaseSeeder extends Seeder
             'DAP 7281', 'DAR 1596', 'DAT 6824', 'DAV 3079', 'DAX 9450',
             'YAA 5216', 'YBC 8742', 'YDE 3195', 'YFG 6408', 'YHJ 2861',
             'YKL 9573', 'YMN 4027', 'YPQ 7318', 'YRS 1684', 'YTV 5940',
+            'ABC 2486', 'ADJ 9031', 'AER 5742', 'AHS 6819', 'AKL 3057',
+            'BCA 7964', 'BDE 1428', 'BGM 8530', 'BJR 4671', 'BKV 9205',
+            'CBN 3187', 'CDR 6502', 'CEF 4816', 'CGH 7294', 'CKM 1058',
+            'PBA 6349', 'PCE 2875', 'PDF 9401', 'PGH 5163', 'PKL 8720',
+            'VAA 4038', 'VBC 7691', 'VDE 2146', 'VFG 9852', 'VHJ 3570',
+            'WAB 6205', 'WCD 1947', 'WEF 7382', 'WGH 4069', 'WJK 8513',
+        ];
+
+        $customers = [
+            ['name' => '-', 'email' => null, 'phone' => null],
+            ['name' => 'Jose Rizal Santos', 'email' => 'jose.santos@example.com', 'phone' => '0917-204-6815'],
+            ['name' => 'Maria Clara Reyes', 'email' => 'maria.reyes@example.com', 'phone' => '0918-572-3094'],
+            ['name' => 'Andres Bonifacio Cruz', 'email' => 'andres.cruz@example.com', 'phone' => '0919-836-4720'],
+            ['name' => 'Gabriela Silang Dela Cruz', 'email' => 'gabriela.delacruz@example.com', 'phone' => '0920-461-7538'],
+            ['name' => '-', 'email' => null, 'phone' => null],
+            ['name' => 'Emilio Aguinaldo Garcia', 'email' => null, 'phone' => '0921-690-2847'],
+            ['name' => 'Corazon Aquino Mendoza', 'email' => 'corazon.mendoza@example.com', 'phone' => null],
+            ['name' => 'Juan Dela Cruz', 'email' => 'juan.delacruz@example.com', 'phone' => '0922-157-9063'],
+            ['name' => 'Luzviminda Bautista', 'email' => null, 'phone' => '0923-804-5196'],
+            ['name' => '-', 'email' => null, 'phone' => null],
+            ['name' => 'Ramon Magsaysay Flores', 'email' => 'ramon.flores@example.com', 'phone' => '0925-638-2419'],
+            ['name' => 'Nena Villanueva', 'email' => 'nena.villanueva@example.com', 'phone' => '0926-475-8301'],
+            ['name' => 'Mark Anthony Soriano', 'email' => null, 'phone' => '0927-913-6048'],
+            ['name' => 'Angelica Navarro', 'email' => 'angelica.navarro@example.com', 'phone' => null],
+            ['name' => '-', 'email' => null, 'phone' => null],
+            ['name' => 'Paolo Villamor', 'email' => 'paolo.villamor@example.com', 'phone' => '0928-340-7652'],
+            ['name' => 'Cristina Mallari', 'email' => null, 'phone' => '0929-582-1470'],
+            ['name' => 'Roberto De Leon', 'email' => 'roberto.deleon@example.com', 'phone' => '0930-719-4265'],
+            ['name' => 'Andrea Magtanggol', 'email' => 'andrea.magtanggol@example.com', 'phone' => '0931-264-8907'],
+            ['name' => '-', 'email' => null, 'phone' => null],
+            ['name' => 'Jocelyn Manalo', 'email' => null, 'phone' => '0932-856-3014'],
+            ['name' => 'Benjie Ramos', 'email' => 'benjie.ramos@example.com', 'phone' => null],
+            ['name' => 'Michelle Santiago', 'email' => 'michelle.santiago@example.com', 'phone' => '0933-608-5179'],
+            ['name' => 'Daniel Fernandez', 'email' => null, 'phone' => '0935-174-9628'],
+            ['name' => '-', 'email' => null, 'phone' => null],
+            ['name' => 'Alyssa Mercado', 'email' => 'alyssa.mercado@example.com', 'phone' => '0936-482-7051'],
+            ['name' => 'Francisca Tolentino', 'email' => null, 'phone' => null],
+            ['name' => 'Edgardo Lacson', 'email' => 'edgardo.lacson@example.com', 'phone' => '0938-715-2940'],
+            ['name' => 'Marites Salazar', 'email' => 'marites.salazar@example.com', 'phone' => '0939-260-8475'],
         ];
 
         $serviceNames = $services->keys()->values()->all();
@@ -288,6 +327,7 @@ class DatabaseSeeder extends Seeder
                 $service = $services->get($serviceName);
                 $size = $sizes->get($sizeName);
                 $plate = $plates[($appointmentCount + $dayIndex) % count($plates)];
+                $customer = $customers[($appointmentCount + ($dayIndex * 2)) % count($customers)];
                 $status = $this->appointmentStatus($date, $time, $today, $pastStatusPattern, $dayIndex, $slotIndex);
                 $amount = null;
                 $completedAt = null;
@@ -304,10 +344,10 @@ class DatabaseSeeder extends Seeder
                     'time' => $time,
                     'service_id' => $service->id,
                     'size_id' => $size->id,
-                    'customer_name' => '-',
-                    'customer_email' => null,
-                    'customer_phone' => null,
-                    'notes' => $this->appointmentNote($plate, $serviceName, $sizeName, $appointmentCount),
+                    'customer_name' => $customer['name'],
+                    'customer_email' => $customer['email'],
+                    'customer_phone' => $customer['phone'],
+                    'notes' => $this->appointmentNote($plate),
                     'status' => $status,
                     'amount' => $amount,
                     'completed_at' => $completedAt,
@@ -335,7 +375,8 @@ class DatabaseSeeder extends Seeder
             ->where(function ($query) {
                 $query
                     ->where('customer_name', '-')
-                    ->orWhere('customer_email', 'sample@email.com');
+                    ->orWhere('customer_email', 'sample@email.com')
+                    ->orWhere('customer_email', 'like', '%@example.com');
             })
             ->pluck('id');
 
@@ -404,20 +445,9 @@ class DatabaseSeeder extends Seeder
         return (int) round($baseMinutes * max(1, $sizeMultiplier));
     }
 
-    private function appointmentNote(string $plate, string $serviceName, string $sizeName, int $index): string
+    private function appointmentNote(string $plate): string
     {
-        $templates = [
-            'Plate %s. Walk-in %s for %s vehicle; customer will return after service.',
-            'Plate %s. Focus on wheel wells and lower panels; muddy from provincial road.',
-            'Plate %s. Do not move dashboard items; interior belongings left in place.',
-            'Plate %s. Company unit; release after staff inspection.',
-            'Plate %s. Customer requested extra care on rims and side mirrors.',
-            'Plate %s. Light interior odor; apply freshener after cleaning.',
-            'Plate %s. Check windshield and wiper area before turnover.',
-            'Plate %s. Repeat vehicle from monthly operations list.',
-        ];
-
-        return sprintf($templates[$index % count($templates)], $plate, $serviceName, strtolower($sizeName));
+        return $plate;
     }
 
     private function consumeInventoryForCompletedAppointment(Appointment $appointment): void
